@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "alternanciaCircular.c"
 
 void readf(){
     FILE *fptr;
@@ -24,11 +25,12 @@ void readf(){
     metodoDeEscalonamento = line[0];
 
     // Token vai guardar a fração de cpu
-    char *cpuFrac;
+    int cpuFrac = line[20] - '0';
+    fclose(fptr);
 
-    cpuFrac = strtok(line, "|");
-    printf("Token: %c\n", *cpuFrac);
-    
+    if (metodoDeEscalonamento == 'a') {
+        alternanciaCircular(cpuFrac);
+    }
 
 }
 
