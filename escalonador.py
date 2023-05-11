@@ -9,6 +9,7 @@ class Processo:
         self.prioridade = prioridade
         self.UID = UID
         self.memoria = memoria
+        self.window = None
 
 class Escalonador:
 
@@ -26,8 +27,8 @@ class Escalonador:
         
         tmp = file.readline()
         
-        totalCpuTimeLeft = 0
         i = 0
+        totalCpuTimeLeft = 0
         
         while ((tmp) != ""):
             tmp = file.readline()
@@ -39,12 +40,10 @@ class Escalonador:
             totalCpuTimeLeft += int(x[2])
             i += 1
         j = 0
-        
         while (totalCpuTimeLeft > 0):
             j = 0
             for j in range(0, i):
                 print(f"Processo {vetprocessos[j].PID} executando")
-                print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
                 
                 if (self.cpufrac <= vetprocessos[j].tempoRestante):
                     self.cpuTime += self.cpufrac
@@ -58,8 +57,8 @@ class Escalonador:
 
                 time.sleep(0.01)
                 os.system("cls")
-        print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
-            
+            print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
+    
     def prioridade(self):
         pass
         

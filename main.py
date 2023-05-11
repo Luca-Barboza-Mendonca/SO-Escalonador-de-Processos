@@ -11,3 +11,5 @@ if (tmp[0] == "alternanciaCircular"):
     escalonador.alternanciaCircular()
 elif(tmp[0] == "prioridade"):
     escalonador.prioridade()
+
+# código para input do usuário aqui
