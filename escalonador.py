@@ -2,6 +2,7 @@ import time
 import os
 
 class Processo:
+    '''Registro que guarda todas as informações de um processo'''
     def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria):
         self.nome = nome
         self.PID = PID
@@ -9,7 +10,6 @@ class Processo:
         self.prioridade = prioridade
         self.UID = UID
         self.memoria = memoria
-        self.window = None
 
 class Escalonador:
 
@@ -20,7 +20,11 @@ class Escalonador:
     
     
     def alternanciaCircular(self):
-        
+        '''Executa cada processo 1 vez pela fração de CPU, iterando sobre o vetor de processos até
+        que o tempo restante de todos seja 0, para isso, guarda-se o tempo total de execução do 
+        conjunto de processos quando esse conjunto é criado, quando o valor total de tempo de execução é 0,
+        significa que todos os processos foram executados.'''
+
         vetprocessos = []
         
         file = open(self.input, "r")
@@ -61,6 +65,9 @@ class Escalonador:
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
     
     def prioridade(self):
+        '''Executa o processo de maior prioridade até o fim antes de executar outro processo.
+        Utiliza uma fila de prioridades para manter acesso O(1) ao próximo processo que deve
+        ser executado, sacrificando complexidade na construção do vetor de processos.'''
         
         vetprocessos = []
 
