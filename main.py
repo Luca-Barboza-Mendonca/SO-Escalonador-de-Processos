@@ -9,3 +9,5 @@ escalonador = Escalonador("input.txt", int(tmp[1]))
 
 if (tmp[0] == "alternanciaCircular"):
     escalonador.alternanciaCircular()
+elif(tmp[0] == ""):
+    pass
