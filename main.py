@@ -7,4 +7,5 @@ tmp = line.split("|")
 
 escalonador = Escalonador("input.txt", int(tmp[1])) 
 
-escalonador.alternanciaCircular()
+if (tmp[0] == "alternanciaCircular"):
+    escalonador.alternanciaCircular()
