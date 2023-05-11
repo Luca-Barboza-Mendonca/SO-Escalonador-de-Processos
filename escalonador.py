@@ -44,6 +44,7 @@ class Escalonador:
             j = 0
             for j in range(0, i):
                 print(f"Processo {vetprocessos[j].PID} executando")
+                print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
                 
                 if (self.cpufrac <= vetprocessos[j].tempoRestante):
                     self.cpuTime += self.cpufrac
@@ -57,8 +58,46 @@ class Escalonador:
 
                 time.sleep(0.01)
                 os.system("cls")
-            print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
+        print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
     
     def prioridade(self):
-        pass
         
+        vetprocessos = []
+
+        file = open(self.input, "r")
+        
+        tmp = file.readline()
+        
+        i = 0
+        totalCpuTimeLeft = 0
+
+        while (tmp != ""):
+            tmp = file.readline()
+            if (tmp == ""):
+                break
+            x = tmp.split("|")
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            vetprocessos.append(processo)
+            vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
+            totalCpuTimeLeft += int(x[2])
+            i += 1
+        
+        while(totalCpuTimeLeft > 0):
+            prioridade = vetprocessos[0]
+            while (prioridade.tempoRestante > 0):
+                print(f"Processo {prioridade.PID} executando")
+                print(f"Tempo restante: {prioridade.tempoRestante}")
+
+                if (self.cpufrac <= prioridade.tempoRestante):
+                    prioridade.tempoRestante -= self.cpufrac
+                    self.cpuTime += self.cpufrac
+                    totalCpuTimeLeft -= self.cpufrac
+                elif (self.cpufrac > prioridade.tempoRestante):
+                    self.cpuTime += prioridade.tempoRestante
+                    totalCpuTimeLeft -= prioridade.tempoRestante
+                    prioridade.tempoRestante = 0
+                time.sleep(0.01)
+                os.system("cls")
+            
+            vetprocessos.pop(0)
+        print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
