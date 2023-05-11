@@ -60,5 +60,6 @@ class Escalonador:
                 os.system("cls")
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
             
-        
+    def prioridade(self):
+        pass
         
