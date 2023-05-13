@@ -189,8 +189,12 @@ class Escalonador(QThread):
                 self.cpuTime += escolhido.tempoRestante
                 totalCpuTimeLeft -= escolhido.tempoRestante
                 escolhido.tempoRestante = 0
+
+                # Quando o processo termina de executar ele precisa sair do vetor
+                vetpesos.remove(escolhido.prioridade)
+                vetprocessos.remove(escolhido)
             
-            time.sleep(1)
+            time.sleep(0.01)
         
         file.close()
 
