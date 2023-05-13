@@ -1,8 +1,9 @@
 import time
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton
-from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtGui import QFont
 
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
@@ -15,12 +16,14 @@ class Processo:
         self.memoria = memoria
 
 class Escalonador(QThread):
+    text_changed = pyqtSignal(str)
 
-    def __init__(self, inp, cpufrac):
+    def __init__(self, inp):
         self.input = inp
-        self.cpufrac = cpufrac
+        self.cpufrac = 0
         self.cpuTime = 0
         QThread.__init__(self)
+        #self.text_changed = pyqtSignal(str)
     
     def __del__(self):
         self.wait()
@@ -54,6 +57,9 @@ class Escalonador(QThread):
         while (totalCpuTimeLeft > 0):
             j = 0
             for j in range(0, i):
+                # Emitindo os resultados para a interface
+                text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
+                self.text_changed.emit(text)
                 print(f"Processo {vetprocessos[j].PID} executando")
                 print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
                 
@@ -71,6 +77,8 @@ class Escalonador(QThread):
                 os.system("cls")
         file.close()
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.text_changed.emit(text)
         if (self.input == "userinput.txt"):
             file = open("userinput.txt", "w")
             file.write("")
@@ -104,6 +112,9 @@ class Escalonador(QThread):
         while(totalCpuTimeLeft > 0):
             prioridade = vetprocessos[0]
             while (prioridade.tempoRestante > 0):
+                # Emitindo os resultados para a interface
+                text = f"Processo {prioridade.PID} executando\nTempo restante: {prioridade.tempoRestante}"
+                self.text_changed.emit(text)
                 print(f"Processo {prioridade.PID} executando")
                 print(f"Tempo restante: {prioridade.tempoRestante}")
 
@@ -121,6 +132,9 @@ class Escalonador(QThread):
             vetprocessos.pop(0)
         file.close()
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.text_changed.emit(text)
+
         if (self.input == "userinput.txt"):
             file = open("userinput.txt", "w")
             file.write("")
@@ -128,10 +142,13 @@ class Escalonador(QThread):
         os.system("cls")
     
     def run(self):
+        # Inicializar o thread e ler o arquivo input
+
         file = open(self.input, "r")
         line = file.readline()
         tmp = line.split("|")
         metodo = tmp[0]
+        self.cpufrac = int(tmp[1])
         if (tmp[0] == "alternanciaCircular"):
             self.alternanciaCircular()
         elif(tmp[0] == "prioridade"):
@@ -146,23 +163,36 @@ class Escalonador(QThread):
                 self.prioridade()
 
 class Interface(QMainWindow):
+    '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
+    no funcionamento do input de usuário. O código abaixo define apenas o funcionamento da interface, e não tem parte na lógica do escalonador.'''
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Escalonador")
-        self.setGeometry(10,10,400,140)
-        self.initUI()
+        self.setGeometry(10,10,800,280)
 
-    def initUI(self):        
-        self.textbox = QLineEdit(self)
-        self.textbox.move(20, 20)
-        self.textbox.resize(280,40)
+        self.label = QLabel(self)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setFont(QFont("Arial", 16))
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        central_widget.setLayout(layout)
         
-        # Create a button in the window
+        self.thread = Escalonador("input.txt")
+        self.thread.text_changed.connect(self.label.setText)
+        self.thread.start()
+
+        self.textbox = QLineEdit(self)
+        self.textbox.move(265, 20)
+        self.textbox.resize(280,40)
+
         self.button = QPushButton('Adicionar processo', self)
         self.button.move(20,80)
-        
-        # connect button to function on_click
         self.button.clicked.connect(self.on_click)
+        layout.addWidget(self.button)
     
     def on_click(self):
         textboxValue = self.textbox.text()
@@ -173,16 +203,8 @@ class Interface(QMainWindow):
 
 def main():
     app = QApplication([])
-    file = open("input.txt", "r")
     window = Interface()
     window.show()
-
-    line = file.readline()
-    tmp = line.split("|")
-
-
-    escalonador = Escalonador("input.txt", int(tmp[1]))
-    escalonador.start()
 
     sys.exit(app.exec())
 
