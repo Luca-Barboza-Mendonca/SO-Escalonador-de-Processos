@@ -1,6 +1,7 @@
 import time
 import os
 import sys
+from random import choices
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
@@ -16,6 +17,8 @@ class Processo:
         self.memoria = memoria
 
 class Escalonador(QThread):
+    '''Classe escalonador que roda como um thread, permitindo paralelismo na interface gráfica. Muito do código entre os diferentes algoritmos é repetido, isso é proposital
+    para garantir modularidade entre os métodos de escalonamento, caso trabalhos futuros tenham o escopo de expandir essa implementação.'''
     text_changed = pyqtSignal(str)
 
     def __init__(self, inp):
@@ -23,7 +26,6 @@ class Escalonador(QThread):
         self.cpufrac = 0
         self.cpuTime = 0
         QThread.__init__(self)
-        #self.text_changed = pyqtSignal(str)
     
     def __del__(self):
         self.wait()
@@ -38,8 +40,10 @@ class Escalonador(QThread):
         vetprocessos = []
         
         file = open(self.input, "r")
-        
-        tmp = file.readline()
+        tmp = "placeholder"
+
+        if (self.input != "userinput.txt"):
+            tmp = file.readline()
         
         i = 0
         totalCpuTimeLeft = 0
@@ -73,7 +77,7 @@ class Escalonador(QThread):
                     vetprocessos[j].tempoRestante = 0
                 
 
-                time.sleep(0.01)
+                time.sleep(1)
                 os.system("cls")
         file.close()
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
@@ -141,6 +145,64 @@ class Escalonador(QThread):
             file.close()
         os.system("cls")
     
+    def loteria(self):
+        '''É escolhido um processo dentro do vetor de processos a partir de uma escolha aleatória com pesos, isto é, a probabilidade de um processo ser escolhido depende
+        do número de bilhetes que esse processo possui (prioridade), quando um processo é escolhido, ele roda por uma self.cpufrac, e a loteria é feita novamente até que 
+        o tempo restante de CPU seja igual a zero.'''
+
+        tmp = "placeholder"
+        vetprocessos = []
+
+        vetpesos = [] # guarda o número de bilhetes de cada processo, para ser passado no random.choices()
+
+        file = open(self.input, "r")
+        if (self.input != "userinput.txt"):
+            tmp = file.readline()
+        
+        i = 0
+        totalCpuTimeLeft = 0
+
+        while ((tmp) != ""):
+            tmp = file.readline()
+            if (tmp == ""):
+                break
+            x = tmp.split("|")
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            vetprocessos.append(processo)
+            vetpesos.append(int(x[3]))  # guarda o peso do processo i na posição i
+            totalCpuTimeLeft += int(x[2])
+            i += 1
+        
+        while(totalCpuTimeLeft > 0):
+            escolhido = choices(vetprocessos, vetpesos, k=1)[0] # Escolher 1 elemento de vetprocessos, com base nos pesos dados por vetpesos
+            # choices não copia a lista que seleciona, então escolhido pode ser usado para alterar o vetor original.
+            # indexar a lista também não cria uma cópia, permitindo a lógica abaixo.
+
+            text = f"Processo {escolhido.PID} executando\nTempo restante: {escolhido.tempoRestante}"
+            self.text_changed.emit(text)
+
+            if (self.cpufrac <= escolhido.tempoRestante):
+                escolhido.tempoRestante -= self.cpufrac
+                self.cpuTime += self.cpufrac
+                totalCpuTimeLeft -= self.cpufrac
+            elif (self.cpufrac > escolhido.tempoRestante):
+                self.cpuTime += escolhido.tempoRestante
+                totalCpuTimeLeft -= escolhido.tempoRestante
+                escolhido.tempoRestante = 0
+            
+            time.sleep(1)
+        
+        file.close()
+
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.text_changed.emit(text)
+
+        if (self.input == "userinput.txt"):
+            file = open("userinput.txt", "w")
+            file.write("")
+            file.close()
+        
+
     def run(self):
         # Inicializar o thread e ler o arquivo input
 
@@ -153,6 +215,8 @@ class Escalonador(QThread):
             self.alternanciaCircular()
         elif(tmp[0] == "prioridade"):
             self.prioridade()
+        elif(tmp[0] == "loteria"):
+            self.loteria()
         file.close()
         
         while True:
@@ -161,6 +225,8 @@ class Escalonador(QThread):
                 self.alternanciaCircular()
             elif(metodo == "prioridade"):
                 self.prioridade()
+            elif(metodo == "loteria"):
+                self.loteria()
 
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
