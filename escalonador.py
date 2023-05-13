@@ -245,7 +245,7 @@ class Escalonador(QThread):
                 self.cpuTime += self.cpufrac
                 totalCpuTimeLeft -= self.cpufrac
 
-                prioridade.tempoRecebido += self.cpufrac # essa adição tem que ser normalizada para prioridades
+                prioridade.tempoRecebido += (self.cpufrac * 100) // prioridade.prioridade # essa adição tem que ser normalizada para prioridades
                 vetprocessos.add(prioridade)
             elif (self.cpufrac >= prioridade.tempoRestante):
                 self.cpuTime += prioridade.tempoRestante
