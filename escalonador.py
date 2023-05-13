@@ -1,7 +1,9 @@
 import time
 import os
 import sys
+from copy import deepcopy
 from random import choices
+from sortedcontainers import SortedKeyList
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
@@ -15,6 +17,7 @@ class Processo:
         self.prioridade = prioridade
         self.UID = UID
         self.memoria = memoria
+        self.tempoRecebido = 0
 
 class Escalonador(QThread):
     '''Classe escalonador que roda como um thread, permitindo paralelismo na interface gráfica. Muito do código entre os diferentes algoritmos é repetido, isso é proposital
@@ -146,7 +149,7 @@ class Escalonador(QThread):
         os.system("cls")
     
     def loteria(self):
-        '''É escolhido um processo dentro do vetor de processos a partir de uma escolha aleatória com pesos, isto é, a probabilidade de um processo ser escolhido depende
+        '''É escolhido um processo dentro do vetor de processos a partir de uma escolha aleatória com pesos, em que a probabilidade de um processo ser escolhido depende
         do número de bilhetes que esse processo possui (prioridade), quando um processo é escolhido, ele roda por uma self.cpufrac, e a loteria é feita novamente até que 
         o tempo restante de CPU seja igual a zero.'''
 
@@ -181,11 +184,11 @@ class Escalonador(QThread):
             text = f"Processo {escolhido.PID} executando\nTempo restante: {escolhido.tempoRestante}"
             self.text_changed.emit(text)
 
-            if (self.cpufrac <= escolhido.tempoRestante):
+            if (self.cpufrac < escolhido.tempoRestante):
                 escolhido.tempoRestante -= self.cpufrac
                 self.cpuTime += self.cpufrac
                 totalCpuTimeLeft -= self.cpufrac
-            elif (self.cpufrac > escolhido.tempoRestante):
+            elif (self.cpufrac >= escolhido.tempoRestante):
                 self.cpuTime += escolhido.tempoRestante
                 totalCpuTimeLeft -= escolhido.tempoRestante
                 escolhido.tempoRestante = 0
@@ -194,6 +197,61 @@ class Escalonador(QThread):
                 vetpesos.remove(escolhido.prioridade)
                 vetprocessos.remove(escolhido)
             
+            time.sleep(1)
+        
+        file.close()
+
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.text_changed.emit(text)
+
+        if (self.input == "userinput.txt"):
+            file = open("userinput.txt", "w")
+            file.write("")
+            file.close()
+    
+    def CFS(self):
+
+        '''Utilizando'''
+        
+        tmp = "placeholder"
+        vetprocessos = SortedKeyList(key=lambda x: x.tempoRecebido)
+        
+        file = open(self.input, "r")
+        if (self.input != "userinput.txt"):
+            tmp = file.readline()
+        
+        i = 0
+        totalCpuTimeLeft = 0
+
+        while ((tmp) != ""):
+            tmp = file.readline()
+            if (tmp == ""):
+                break
+            x = tmp.split("|")
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            vetprocessos.add(processo)
+            totalCpuTimeLeft += int(x[2])
+            i += 1
+        
+        while(totalCpuTimeLeft > 0):
+            prioridade = deepcopy(vetprocessos[0]) # faz uma cópia do objeto em 0, sem referencia ao vetor
+            vetprocessos.pop(0) # remove o objeto temporariamente, necessário para forçar ordem
+
+            text = f"Processo {prioridade.PID} executando\nTempo restante: {prioridade.tempoRestante}"
+            self.text_changed.emit(text)
+
+            if (self.cpufrac < prioridade.tempoRestante):
+                prioridade.tempoRestante -= self.cpufrac
+                self.cpuTime += self.cpufrac
+                totalCpuTimeLeft -= self.cpufrac
+
+                prioridade.tempoRecebido += self.cpufrac # essa adição tem que ser normalizada para prioridades
+                vetprocessos.add(prioridade)
+            elif (self.cpufrac >= prioridade.tempoRestante):
+                self.cpuTime += prioridade.tempoRestante
+                totalCpuTimeLeft -= prioridade.tempoRestante
+                prioridade.tempoRestante = 0
+
             time.sleep(0.01)
         
         file.close()
@@ -205,7 +263,6 @@ class Escalonador(QThread):
             file = open("userinput.txt", "w")
             file.write("")
             file.close()
-        
 
     def run(self):
         # Inicializar o thread e ler o arquivo input
@@ -221,6 +278,8 @@ class Escalonador(QThread):
             self.prioridade()
         elif(tmp[0] == "loteria"):
             self.loteria()
+        elif(tmp[0] == "CFS"):
+            self.CFS()
         file.close()
         
         while True:
@@ -231,6 +290,8 @@ class Escalonador(QThread):
                 self.prioridade()
             elif(metodo == "loteria"):
                 self.loteria()
+            elif(metodo == "CFS"):
+                self.CFS()
 
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo

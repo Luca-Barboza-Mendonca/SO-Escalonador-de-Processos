@@ -1,16 +1,27 @@
-from escalonador import Escalonador
-
-file = open("input.txt", "r")
-
-line = file.readline()
-tmp = line.split("|")
+from copy import deepcopy
+from sortedcontainers import SortedKeyList
 
 
-escalonador = Escalonador("input.txt", int(tmp[1]))
+class Processo:
+    '''Registro que guarda todas as informações de um processo'''
+    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria):
+        self.nome = nome
+        self.PID = PID
+        self.tempoRestante = tempoRestante
+        self.prioridade = prioridade
+        self.UID = UID
+        self.memoria = memoria
+        self.tempoRecebido = 0
 
-if (tmp[0] == "alternanciaCircular"):
-    escalonador.alternanciaCircular()
-elif(tmp[0] == "prioridade"):
-    escalonador.prioridade()
+a  = SortedKeyList(key=lambda x: x.tempoRecebido)
 
-# código para input do usuário aqui
+b = Processo("b", 1, 2, 3, 4, 5)
+c = Processo("c", 1, 2, 3, 4, 5)
+d = Processo("d", 1, 2, 3, 4, 5)
+
+a.add(b)
+a.add(c)
+a.add(d)
+
+e = deepcopy(a[0])
+print(e)

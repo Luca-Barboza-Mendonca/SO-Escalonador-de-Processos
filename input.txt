@@ -1,4 +1,4 @@
-loteria|6
+CFS|6
 processo-0|0|54|2|1|5120
 processo-1|1|18|20|5|7168
 processo-2|2|30|76|4|3072
