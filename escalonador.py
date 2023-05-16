@@ -210,8 +210,6 @@ class Escalonador(QThread):
             file.close()
     
     def CFS(self):
-
-        '''Utilizando'''
         
         tmp = "placeholder"
         vetprocessos = SortedKeyList(key=lambda x: x.tempoRecebido)
@@ -245,14 +243,14 @@ class Escalonador(QThread):
                 self.cpuTime += self.cpufrac
                 totalCpuTimeLeft -= self.cpufrac
 
-                prioridade.tempoRecebido += (self.cpufrac * 100) // prioridade.prioridade # essa adição tem que ser normalizada para prioridades
+                prioridade.tempoRecebido += self.cpufrac * prioridade.prioridade # assumindo que menor numero == mais prioridade
                 vetprocessos.add(prioridade)
             elif (self.cpufrac >= prioridade.tempoRestante):
                 self.cpuTime += prioridade.tempoRestante
                 totalCpuTimeLeft -= prioridade.tempoRestante
                 prioridade.tempoRestante = 0
 
-            time.sleep(0.01)
+            time.sleep(1)
         
         file.close()
 
@@ -282,6 +280,7 @@ class Escalonador(QThread):
             self.CFS()
         file.close()
         
+        # mudar forma como input funciona
         while True:
             self.input = "userinput.txt"
             if (metodo == "alternanciaCircular"):
