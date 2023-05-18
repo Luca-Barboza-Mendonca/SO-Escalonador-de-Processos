@@ -70,15 +70,18 @@ class Escalonador(QThread):
                 print(f"Processo {vetprocessos[j].PID} executando")
                 print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
                 
-                if (self.cpufrac <= vetprocessos[j].tempoRestante):
+                if (self.cpufrac < vetprocessos[j].tempoRestante):
                     self.cpuTime += self.cpufrac
                     vetprocessos[j].tempoRestante -= self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
-                elif (self.cpufrac > vetprocessos[j].tempoRestante):
+                elif (self.cpufrac >= vetprocessos[j].tempoRestante):
                     self.cpuTime += vetprocessos[j].tempoRestante
                     totalCpuTimeLeft -= vetprocessos[j].tempoRestante
                     vetprocessos[j].tempoRestante = 0
-                
+
+                    fout = open("output.txt", "a")
+                    fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
+                    fout.close()
 
                 time.sleep(1)
                 os.system("cls")
@@ -125,14 +128,19 @@ class Escalonador(QThread):
                 print(f"Processo {prioridade.PID} executando")
                 print(f"Tempo restante: {prioridade.tempoRestante}")
 
-                if (self.cpufrac <= prioridade.tempoRestante):
+                if (self.cpufrac < prioridade.tempoRestante):
                     prioridade.tempoRestante -= self.cpufrac
                     self.cpuTime += self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
-                elif (self.cpufrac > prioridade.tempoRestante):
+                elif (self.cpufrac >= prioridade.tempoRestante):
                     self.cpuTime += prioridade.tempoRestante
                     totalCpuTimeLeft -= prioridade.tempoRestante
                     prioridade.tempoRestante = 0
+
+                    fout = open("output.txt", "a")
+                    fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
+                    fout.close()
+
                 time.sleep(1)
                 os.system("cls")
             
@@ -193,9 +201,15 @@ class Escalonador(QThread):
                 totalCpuTimeLeft -= escolhido.tempoRestante
                 escolhido.tempoRestante = 0
 
+                fout = open("output.txt", "a")
+                fout.write(f"{escolhido.nome} encerrou em {self.cpuTime}\n")
+                fout.close()
+
                 # Quando o processo termina de executar ele precisa sair do vetor
                 vetpesos.remove(escolhido.prioridade)
                 vetprocessos.remove(escolhido)
+
+                
             
             time.sleep(1)
         
@@ -250,7 +264,11 @@ class Escalonador(QThread):
                 totalCpuTimeLeft -= prioridade.tempoRestante
                 prioridade.tempoRestante = 0
 
-            time.sleep(1)
+                fout = open("output.txt", "a")
+                fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
+                fout.close()
+
+            #time.sleep(1)
         
         file.close()
 
@@ -332,6 +350,10 @@ class Interface(QMainWindow):
 
 
 def main():
+    file = open("output.txt", "w")
+    file.write("")
+    file.close()
+
     app = QApplication([])
     window = Interface()
     window.show()
