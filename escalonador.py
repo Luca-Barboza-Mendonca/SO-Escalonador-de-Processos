@@ -53,6 +53,10 @@ def initProcessos(modo):
             vetprocessos.append(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
+        
+        file = open("input.txt", "w")
+        file.write("")
+        file.close()
     elif modo == 2:
 
         # Prioridade
@@ -73,6 +77,9 @@ def initProcessos(modo):
             vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
             totalCpuTimeLeft += int(x[2])
             i += 1
+        file = open("input.txt", "w")
+        file.write("")
+        file.close()
     elif modo == 3:
 
         global vetpesos
@@ -93,6 +100,9 @@ def initProcessos(modo):
             vetpesos.append(int(x[3]))  # guarda o peso do processo i na posição i
             totalCpuTimeLeft += int(x[2])
             i += 1
+        file = open("input.txt", "w")
+        file.write("")
+        file.close()
     
     elif modo == 4:
         tmp = "placeholder"
@@ -113,6 +123,9 @@ def initProcessos(modo):
             vetprocessos.add(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
+        file = open("input.txt", "w")
+        file.write("")
+        file.close()
 
 def addProcesso(proc):
     '''Adicionar um processo específicado pelo usuário ao vetor global'''
@@ -140,10 +153,11 @@ class Escalonador(QThread):
     para garantir modularidade entre os métodos de escalonamento, caso trabalhos futuros tenham o escopo de expandir essa implementação.'''
     text_changed = pyqtSignal(str)
 
-    def __init__(self, inp):
+    def __init__(self, inp, test=False):
         self.input = inp
         self.cpufrac = 0
         self.cpuTime = 0
+        self.test = test # Só para desabilitar o sleep
         QThread.__init__(self)
     
     def __del__(self):
@@ -158,28 +172,6 @@ class Escalonador(QThread):
 
         global algo 
         algo = 1
-
-        # vetprocessos = []
-        
-        # file = open(self.input, "r")
-        # tmp = "placeholder"
-
-        # if (self.input != "userinput.txt"):
-        #     tmp = file.readline()
-        
-        
-        
-        
-        # initprocessos:
-        # while ((tmp) != ""):
-        #     tmp = file.readline()
-        #     if (tmp == ""):
-        #         break
-        #     x = tmp.split("|")
-        #     processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
-        #     vetprocessos.append(processo)
-        #     totalCpuTimeLeft += int(x[2])
-        #     i += 1
 
         global totalCpuTimeLeft
 
@@ -210,17 +202,15 @@ class Escalonador(QThread):
                     fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
                     fout.close()
 
-                time.sleep(1)
+                if (self.test):
+                    time.sleep(0.1)
                 os.system("cls")
-        # file.close()
+
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
         self.text_changed.emit(text)
-        if (self.input == "userinput.txt"):
-            file = open("userinput.txt", "w")
-            file.write("")
-            file.close()
         os.system("cls")
+
     
     def prioridade(self):
         '''Executa o processo de maior prioridade até o fim antes de executar outro processo.
@@ -230,27 +220,9 @@ class Escalonador(QThread):
         global algo 
         algo = 2
         
-        # tmp = "placeholder"
-        # vetprocessos = []
-        # file = open(self.input, "r")
-        # if (self.input != "userinput.txt"):
-        #     tmp = file.readline()
-        
         
         global totalCpuTimeLeft
         global vetprocessos
-
-        # i = 0
-        # while (tmp != ""):
-        #     tmp = file.readline()
-        #     if (tmp == ""):
-        #         break
-        #     x = tmp.split("|")
-        #     processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
-        #     vetprocessos.append(processo)
-        #     vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
-        #     totalCpuTimeLeft += int(x[2])
-        #     i += 1
 
         initProcessos(2) # inicializa o vetor global em modo prioridade
         
@@ -276,7 +248,8 @@ class Escalonador(QThread):
                     fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
                     fout.close()
 
-                time.sleep(1)
+                if (self.test):
+                    time.sleep(0.1)
                 os.system("cls")
             
             vetprocessos.pop(0)
@@ -284,11 +257,6 @@ class Escalonador(QThread):
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
         self.text_changed.emit(text)
-
-        if (self.input == "userinput.txt"):
-            file = open("userinput.txt", "w")
-            file.write("")
-            file.close()
         os.system("cls")
     
     def loteria(self):
@@ -298,30 +266,6 @@ class Escalonador(QThread):
 
         global algo 
         algo = 3
-
-        
-        # vetprocessos = []
-
-        # vetpesos = []  guarda o número de bilhetes de cada processo, para ser passado no random.choices()
-        
-        # tmp = "placeholder"
-        # file = open(self.input, "r")
-        # if (self.input != "userinput.txt"):
-        #     tmp = file.readline()
-        
-        # i = 0
-        # totalCpuTimeLeft = 0
-
-        # while ((tmp) != ""):
-        #     tmp = file.readline()
-        #     if (tmp == ""):
-        #         break
-        #     x = tmp.split("|")
-        #     processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
-        #     vetprocessos.append(processo)
-        #     vetpesos.append(int(x[3]))  # guarda o peso do processo i na posição i
-        #     totalCpuTimeLeft += int(x[2])
-        #     i += 1
 
         global vetprocessos
         global vetpesos
@@ -356,42 +300,17 @@ class Escalonador(QThread):
 
                 
             
-            time.sleep(1)
+            if (self.test):
+                time.sleep(0.1)
         
-        # file.close()
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
         self.text_changed.emit(text)
-
-        if (self.input == "userinput.txt"):
-            file = open("userinput.txt", "w")
-            file.write("")
-            file.close()
     
     def CFS(self):
 
         global algo 
         algo = 4
-        
-        # tmp = "placeholder"
-        # vetprocessos = SortedKeyList(key=lambda x: x.tempoRecebido)
-        
-        # file = open(self.input, "r")
-        # if (self.input != "userinput.txt"):
-        #     tmp = file.readline()
-        
-        # i = 0
-        # totalCpuTimeLeft = 0
-
-        # while ((tmp) != ""):
-        #     tmp = file.readline()
-        #     if (tmp == ""):
-        #         break
-        #     x = tmp.split("|")
-        #     processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
-        #     vetprocessos.add(processo)
-        #     totalCpuTimeLeft += int(x[2])
-        #     i += 1
         
         global vetprocessos
         global totalCpuTimeLeft
@@ -420,18 +339,11 @@ class Escalonador(QThread):
                 fout = open("output.txt", "a")
                 fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
                 fout.close()
-
-            #time.sleep(1)
-        
-        # file.close()
+            if (self.test):
+                time.sleep(0.1)
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
         self.text_changed.emit(text)
-
-        if (self.input == "userinput.txt"):
-            file = open("userinput.txt", "w")
-            file.write("")
-            file.close()
 
     def run(self):
         # Inicializar o thread e ler o arquivo input
@@ -442,26 +354,18 @@ class Escalonador(QThread):
         metodo = tmp[0]
         self.cpufrac = int(tmp[1])
         if (tmp[0] == "alternanciaCircular"):
-            self.alternanciaCircular()
+            while True:
+                self.alternanciaCircular()
         elif(tmp[0] == "prioridade"):
-            self.prioridade()
+            while True:
+                self.prioridade()
         elif(tmp[0] == "loteria"):
-            self.loteria()
+            while True:
+                self.loteria()
         elif(tmp[0] == "CFS"):
-            self.CFS()
+            while True:
+                self.CFS()
         file.close()
-        
-        # mudar forma como input funciona
-        # while True:
-        #     self.input = "userinput.txt"
-        #     if (metodo == "alternanciaCircular"):
-        #         self.alternanciaCircular()
-        #     elif(metodo == "prioridade"):
-        #         self.prioridade()
-        #     elif(metodo == "loteria"):
-        #         self.loteria()
-        #     elif(metodo == "CFS"):
-        #         self.CFS()
 
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
@@ -482,7 +386,7 @@ class Interface(QMainWindow):
         layout.addWidget(self.label)
         central_widget.setLayout(layout)
         
-        self.thread = Escalonador("input.txt")
+        self.thread = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
         self.thread.text_changed.connect(self.label.setText)
         self.thread.start()
 
@@ -498,11 +402,10 @@ class Interface(QMainWindow):
     def on_click(self):
         textboxValue = self.textbox.text()
         addProcesso(textboxValue)
-
+        self.textbox.setText("")
         # código antigo
         # file = open("userinput.txt", "a")
         # file.write(textboxValue + "\n")
-        # self.textbox.setText("")
 
 
 def main():
