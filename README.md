@@ -6,7 +6,7 @@ Python 3
 Instalação:\
 pip install PyQt5
 
-pip install sortedcontainers\
+pip install sortedcontainers
 
 Uso:\
 -Especificar os processos que devem ser adicionados à CPU inicialmente no arquivo input.txt\
