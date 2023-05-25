@@ -10,7 +10,8 @@ pip install sortedcontainers
 
 Uso:\
 -Especificar os processos que devem ser adicionados à CPU inicialmente no arquivo input.txt\
--Ao adicionar processos durante a execução do programa, utilizar o mesmo padrão do arquivo de input
+-Ao adicionar processos durante a execução do programa, utilizar o mesmo padrão do arquivo de input\
+-Os resultados são mostrados no arquivo output.txt
 
 Exemplo input.txt :\
 prioridade|8\
