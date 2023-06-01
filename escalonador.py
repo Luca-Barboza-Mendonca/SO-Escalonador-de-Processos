@@ -83,6 +83,7 @@ def initProcessos(modo):
     elif modo == 3:
 
         global vetpesos
+        vetprocessos = []
         tmp = "placeholder"
         file = open("input.txt", "r")
         tmp = file.readline()
@@ -182,7 +183,7 @@ class Escalonador(QThread):
             #executar escalonamento
 
             j = 0
-            for j in range(0, i):
+            for j in range(0, len(vetprocessos)):
                 # Emitindo os resultados para a interface
                 text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
                 self.text_changed.emit(text)
@@ -386,7 +387,7 @@ class Interface(QMainWindow):
         layout.addWidget(self.label)
         central_widget.setLayout(layout)
         
-        self.thread = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
+        self.thread = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
         self.thread.text_changed.connect(self.label.setText)
         self.thread.start()
 
