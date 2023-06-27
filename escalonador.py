@@ -1,5 +1,6 @@
 import time
 import os
+import sys
 from copy import deepcopy
 from random import choices
 from sortedcontainers import SortedKeyList
@@ -366,6 +367,18 @@ class Escalonador(QThread):
         tmp = line.split("|")
         metodo = tmp[0]
         self.cpufrac = int(tmp[1])
+
+        global memPol
+        global tamMem
+        global tamPag
+        global percAloc
+        global acessosPorCiclo
+        memPol = tmp[2]
+        tamMem = int(tmp[3])
+        tamPag = int(tmp[4])
+        percAloc = int(tmp[5])
+        acessosPorCiclo = int(tmp[6])
+
         if (metodo == "alternanciaCircular"):
             while True:
                 self.alternanciaCircular()
