@@ -134,19 +134,22 @@ def addProcesso(proc):
     processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
     global vetprocessos
     global totalCpuTimeLeft
-    totalCpuTimeLeft += int(x[2])
 
     global algo
-
-    if algo == 2:
-        vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
+    if algo == 1:
         vetprocessos.append(processo)
+    elif algo == 2:
+        print("test algo 2")
+        vetprocessos.append(processo)
+        vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
     elif algo == 3:
         global vetpesos
         vetpesos.append(int(x[3]))
         vetprocessos.append(processo)
     elif algo == 4:
         vetprocessos.add(processo)
+    
+    totalCpuTimeLeft += int(x[2])
 
 
 class Escalonador(QThread):
@@ -204,7 +207,7 @@ class Escalonador(QThread):
                     fout.close()
 
                 if (self.test):
-                    time.sleep(0.1)
+                    time.sleep(1)
                 os.system("cls")
 
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
@@ -228,7 +231,8 @@ class Escalonador(QThread):
         initProcessos(2) # inicializa o vetor global em modo prioridade
         
         while(totalCpuTimeLeft > 0):
-            prioridade = vetprocessos[0]
+            prioridade =deepcopy(vetprocessos[0])
+            vetprocessos.pop(0)
             while (prioridade.tempoRestante > 0):
                 # Emitindo os resultados para a interface
                 text = f"Processo {prioridade.PID} executando\nTempo restante: {prioridade.tempoRestante}"
@@ -244,16 +248,16 @@ class Escalonador(QThread):
                     self.cpuTime += prioridade.tempoRestante
                     totalCpuTimeLeft -= prioridade.tempoRestante
                     prioridade.tempoRestante = 0
-
+                    
                     fout = open("output.txt", "a")
                     fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
                     fout.close()
-
+                    
                 if (self.test):
-                    time.sleep(0.1)
+                    time.sleep(1)
                 os.system("cls")
             
-            vetprocessos.pop(0)
+            
         # file.close()
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
@@ -302,7 +306,7 @@ class Escalonador(QThread):
                 
             
             if (self.test):
-                time.sleep(0.1)
+                time.sleep(1)
         
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
@@ -341,7 +345,7 @@ class Escalonador(QThread):
                 fout.write(f"{prioridade.nome} encerrou em {self.cpuTime}\n")
                 fout.close()
             if (self.test):
-                time.sleep(0.1)
+                time.sleep(1)
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
         self.text_changed.emit(text)
@@ -367,58 +371,3 @@ class Escalonador(QThread):
             while True:
                 self.CFS()
         file.close()
-
-class Interface(QMainWindow):
-    '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
-    no funcionamento do input de usuário. O código abaixo define apenas o funcionamento da interface, e não tem parte na lógica do escalonador.'''
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Escalonador")
-        self.setGeometry(10,10,800,280)
-
-        self.label = QLabel(self)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.label.setFont(QFont("Arial", 16))
-
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.label)
-        central_widget.setLayout(layout)
-        
-        self.thread = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
-        self.thread.text_changed.connect(self.label.setText)
-        self.thread.start()
-
-        self.textbox = QLineEdit(self)
-        self.textbox.move(265, 20)
-        self.textbox.resize(280,40)
-
-        self.button = QPushButton('Adicionar processo', self)
-        self.button.move(20,80)
-        self.button.clicked.connect(self.on_click)
-        layout.addWidget(self.button)
-    
-    def on_click(self):
-        textboxValue = self.textbox.text()
-        addProcesso(textboxValue)
-        self.textbox.setText("")
-        # código antigo
-        # file = open("userinput.txt", "a")
-        # file.write(textboxValue + "\n")
-
-
-def main():
-    file = open("output.txt", "w")
-    file.write("")
-    file.close()
-
-    app = QApplication([])
-    window = Interface()
-    window.show()
-
-    sys.exit(app.exec())
-
-if __name__ == '__main__':
-    main()
