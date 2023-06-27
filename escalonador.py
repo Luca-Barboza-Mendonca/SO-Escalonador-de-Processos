@@ -1,6 +1,5 @@
 import time
 import os
-import sys
 from copy import deepcopy
 from random import choices
 from sortedcontainers import SortedKeyList
@@ -8,6 +7,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, Q
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 
+memPol = None # Política de memória, local ou global
+tamMem = None # Tamanho da memória
+tamPag = None # Tamanho das página e molduras
+percAloc = None # Percentual máximo de memória que um processo pode ter na memória principal
+acessosPorCiclo = None # Acessos á memória por ciclo de cpu
 
 vetprocessos = None
 totalCpuTimeLeft = 0
@@ -16,13 +20,14 @@ algo = 1
 
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
-    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria):
+    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria, sequenciaMemoria):
         self.nome = nome
         self.PID = PID
         self.tempoRestante = tempoRestante
         self.prioridade = prioridade
         self.UID = UID
         self.memoria = memoria
+        self.sequenciaMemoria = sequenciaMemoria
         self.tempoRecebido = 0
 
 def initProcessos(modo):
@@ -49,7 +54,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
             vetprocessos.append(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
@@ -72,7 +77,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
             vetprocessos.append(processo)
             vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
             totalCpuTimeLeft += int(x[2])
@@ -96,7 +101,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
             vetprocessos.append(processo)
             vetpesos.append(int(x[3]))  # guarda o peso do processo i na posição i
             totalCpuTimeLeft += int(x[2])
@@ -120,7 +125,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
             vetprocessos.add(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
@@ -131,7 +136,7 @@ def initProcessos(modo):
 def addProcesso(proc):
     '''Adicionar um processo específicado pelo usuário ao vetor global'''
     x = proc.split("|")
-    processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]))
+    processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
     global vetprocessos
     global totalCpuTimeLeft
 
@@ -354,22 +359,23 @@ class Escalonador(QThread):
 
     def run(self):
         # Inicializar o thread e ler o arquivo input
+        # algoritmoDeEscalonamento|fraçãoDeCPU|políticaMemória|tamanhoMemória|tamanhoPáginasMolduras|percentualAlocação|acessosPorCiclo
 
         file = open(self.input, "r")
         line = file.readline()
         tmp = line.split("|")
         metodo = tmp[0]
         self.cpufrac = int(tmp[1])
-        if (tmp[0] == "alternanciaCircular"):
+        if (metodo == "alternanciaCircular"):
             while True:
                 self.alternanciaCircular()
-        elif(tmp[0] == "prioridade"):
+        elif(metodo == "prioridade"):
             while True:
                 self.prioridade()
-        elif(tmp[0] == "loteria"):
+        elif(metodo == "loteria"):
             while True:
                 self.loteria()
-        elif(tmp[0] == "CFS"):
+        elif(metodo == "CFS"):
             while True:
                 self.CFS()
         file.close()
