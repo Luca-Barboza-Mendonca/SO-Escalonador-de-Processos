@@ -1,4 +1,0 @@
-prioridade|8
-processo-0|0|56|95|1|5120
-processo-1|1|32|10|6|7168
-processo-2|2|72|65|9|9216

@@ -187,6 +187,8 @@ class Escalonador(QThread):
 
             j = 0
             for j in range(0, len(vetprocessos)):
+                if (vetprocessos[j].tempoRestante == 0):
+                    continue
                 # Emitindo os resultados para a interface
                 text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
                 self.text_changed.emit(text)

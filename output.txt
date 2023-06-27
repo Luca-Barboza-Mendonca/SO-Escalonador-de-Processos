@@ -1,2 +1,4 @@
-processo-0 encerrou em 56
-processo-3 encerrou em 112
+processo-1 encerrou em 104
+processo-0 encerrou em 176
+processo-2 encerrou em 216
+processo-3 encerrou em 232
