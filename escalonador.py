@@ -381,8 +381,8 @@ class Escalonador(QThread):
         tamPag = int(tmp[4])
         percAloc = int(tmp[5])
         acessosPorCiclo = int(tmp[6])
-        initDrive()
-        self.gerente = GerenciadorDeMemoria()
+        initDrive(tamMem, tamPag)
+        self.gerente = GerenciadorDeMemoria(memPol, tamMem, tamPag, percAloc, acessosPorCiclo)
         
 
         if (metodo == "alternanciaCircular"):
