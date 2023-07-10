@@ -23,10 +23,6 @@ class Interface(QMainWindow):
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.start()
 
-        self.threadGerente = GerenciadorDeMemoria()
-        # Connects go here
-        self.threadGerente.start()
-
         self.textbox = QLineEdit(self)
         self.textbox.move(265, 20)
         self.textbox.resize(280,40)

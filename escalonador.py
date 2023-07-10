@@ -170,6 +170,7 @@ class Escalonador(QThread):
         self.cpufrac = 0
         self.cpuTime = 0
         self.test = test # Só para desabilitar o sleep
+        self.gerente = None
         QThread.__init__(self)
     
     def __del__(self):
@@ -381,6 +382,7 @@ class Escalonador(QThread):
         percAloc = int(tmp[5])
         acessosPorCiclo = int(tmp[6])
         initDrive()
+        self.gerente = GerenciadorDeMemoria()
         
 
         if (metodo == "alternanciaCircular"):

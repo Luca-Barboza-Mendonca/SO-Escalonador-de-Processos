@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+
 
 from escalonador import *
 
@@ -13,8 +13,11 @@ class Memoria:
         self.tamMem = tamMem # tamanho da memória principal
         self.memoria = [0] * (tamMem/tamPag) # vetor de páginas, cada posição guarda o PID de um processo ou 0, indicando que está vazio
 
-class GerenciadorDeMemoria(QThread):
-    '''Ideia: receber um sinal do escalonador indicando um acesso a memória'''
+    def getTamMem(self):
+        return self.tamMem
+
+class GerenciadorDeMemoria():
+    '''Objeto gerenciador é utilizado diretamente pelo escalonador, não sendo acessível pela interface e descomplicando a sincronização'''
     def __init__(self):
         global memPol
         global tamMem
@@ -26,6 +29,5 @@ class GerenciadorDeMemoria(QThread):
         self.memPol = memPol
         self.acessosPorCiclo = acessosPorCiclo
 
-    def run(self):
-        pass
-
+    def getTamMem(self):
+        return self.memoria.getTamMem()
