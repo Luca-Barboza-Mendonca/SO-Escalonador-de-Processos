@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, Q
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 
+from gerenciadorDeMemoria import *
+
 memPol = None # Política de memória, local ou global
 tamMem = None # Tamanho da memória
 tamPag = None # Tamanho das página e molduras
@@ -378,6 +380,8 @@ class Escalonador(QThread):
         tamPag = int(tmp[4])
         percAloc = int(tmp[5])
         acessosPorCiclo = int(tmp[6])
+        initDrive()
+        
 
         if (metodo == "alternanciaCircular"):
             while True:

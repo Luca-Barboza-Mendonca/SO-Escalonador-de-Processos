@@ -19,9 +19,13 @@ class Interface(QMainWindow):
         layout.addWidget(self.label)
         central_widget.setLayout(layout)
         
-        self.thread = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
-        self.thread.text_changed.connect(self.label.setText)
-        self.thread.start()
+        self.threadEscalonador = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
+        self.threadEscalonador.text_changed.connect(self.label.setText)
+        self.threadEscalonador.start()
+
+        self.threadGerente = GerenciadorDeMemoria()
+        # Connects go here
+        self.threadGerente.start()
 
         self.textbox = QLineEdit(self)
         self.textbox.move(265, 20)
