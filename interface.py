@@ -19,7 +19,7 @@ class Interface(QMainWindow):
         layout.addWidget(self.label)
         central_widget.setLayout(layout)
         
-        self.threadEscalonador = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
+        self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.start()
 
