@@ -1,4 +1,5 @@
 from escalonador import *
+from copy import deepcopy
 
 tempoFIFO = 0
 tempoMRU = 0
@@ -11,6 +12,7 @@ class Pagina:
         self.ultimoAcesso = ultimoAcesso
         self.tempoEntrada = tempoEntrada
         self.numAcessos = 0 # usado apenas para o nuf
+        self.proxUso = float('inf')
     
     def setUltimoAcesso(self, tempo):
         self.ultimoAcesso = tempo
@@ -32,11 +34,13 @@ class Memoria:
         for i in range(0, self.numPag):
             print(f"{self.memoria[i].index} ", end="")
     
-    def addPagina(self, index, tempo):
+    def addPagina(self, index, tempo, proxUso=float('inf')):
         '''Adiciona o indice na primeira pagina vazia que achar'''
         for i in range(0, self.numPag):
             if (self.memoria[i].index == -1):
-                self.memoria[i] = Pagina(index, 0, tempo)
+                pagina = Pagina(index, 0, tempo)
+                pagina.proxUso = proxUso
+                self.memoria[i] = pagina
                 self.numElem += 1
                 return 1
         return -1
@@ -62,6 +66,9 @@ class Memoria:
     
     def orderNUF(self):
         self.memoria = sorted(self.memoria, key=lambda x: x.numAcessos)
+
+    def orderOtimo(self):
+        self.memoria = sorted(self.memoria, key=lambda x: x.proxUso, reverse=True)
 
 class GerenciadorDeMemoria():
     '''Objeto gerenciador é utilizado diretamente pelo escalonador, não sendo acessível pela interface e descomplicando a sincronização'''
@@ -166,7 +173,7 @@ class GerenciadorDeMemoria():
 
             if (busca == -1):
                 if (self.memoriaNUF.numElem == self.memoriaNUF.numPag):
-                    self.memoriaNUF.removePagina(0) # assume que o vetor está corretamente ordenado
+                    self.memoriaNUF.removePagina(0) # assume que o vetor está corretamente ordenado, também assume que não há página vazia, garantido pelo if
                 
                 self.memoriaNUF.addPagina(acessos[i], tempoNUF)
                 self.memoriaNUF.orderNUF()
@@ -184,4 +191,41 @@ class GerenciadorDeMemoria():
         self.memoriaNUF.printMem()
 
     def Otimo(self, processo):
-        pass
+        '''Quando há necessidade de troca, encontrar o elemnto que está na memória e que falta a maior quantidade de tempo para ser necessário
+        Ideia: Produzir, a cada troca, um vetor especificando a ordem de acesso futuro das Páginas que estão na memória'''
+        global tempoOtimo
+        acessos = processo.sequenciaMemoria
+        acessosManip = deepcopy(acessos)
+        tam = len(acessos)
+        # print("\n")
+        for i in range(0, tam):
+            self.memoriaOtimo.orderOtimo()
+            acessosManip.pop(0)
+            busca = self.memoriaOtimo.buscaPagina(acessos[i])
+
+            if (busca == -1):
+                if (self.memoriaOtimo.numElem == self.memoriaOtimo.numPag):
+                    self.memoriaOtimo.removePagina(0)
+                try:
+                    proxIndex = acessosManip.index(acessos[i])
+                    proxUso = len(acessosManip[:proxIndex])
+                except ValueError:
+                    proxUso = float('inf')
+                self.memoriaOtimo.addPagina(acessos[i], tempoOtimo, proxUso)
+                self.memoriaOtimo.orderOtimo()
+                self.numTrocasOtimo += 1
+            try:
+                proxIndex = acessosManip.index(acessos[i])
+                proxUso = len(acessosManip[:proxIndex])
+            except ValueError:
+                proxUso = float('inf')
+            busca = self.memoriaOtimo.buscaPagina(acessos[i])
+            self.memoriaOtimo.memoria[busca].proxUso = proxUso
+
+            tempoOtimo += 1
+
+        
+        print("\n")
+        print(f"Trocas Otimo: {self.numTrocasOtimo}")
+        print("Memória Otimo final: ", end="")
+        self.memoriaOtimo.printMem()
