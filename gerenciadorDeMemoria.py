@@ -10,7 +10,7 @@ class Pagina:
         self.index = index
         self.ultimoAcesso = ultimoAcesso
         self.tempoEntrada = tempoEntrada
-        self.numUsos = 0 # usado apenas para o nuf
+        self.numAcessos = 0 # usado apenas para o nuf
     
     def setUltimoAcesso(self, tempo):
         self.ultimoAcesso = tempo
@@ -59,6 +59,9 @@ class Memoria:
     def orderMRU(self):
         # tempo é uma variável que cresce, então o menos recentemente usado terá menor tempo de último acesso
         self.memoria = sorted(self.memoria, key=lambda x: x.ultimoAcesso)
+    
+    def orderNUF(self):
+        self.memoria = sorted(self.memoria, key=lambda x: x.numAcessos)
 
 class GerenciadorDeMemoria():
     '''Objeto gerenciador é utilizado diretamente pelo escalonador, não sendo acessível pela interface e descomplicando a sincronização'''
@@ -152,7 +155,33 @@ class GerenciadorDeMemoria():
         self.memoriaMRU.printMem()
 
     def NUF(self, processo):
-        pass
+        global tempoNUF
+        # tempoNUF não faz nada atualmente
+        acessos = processo.sequenciaMemoria
+        tam = len(acessos)
+
+        for i in range(0, tam):
+            self.memoriaNUF.orderNUF()
+            busca = self.memoriaNUF.buscaPagina(acessos[i])
+
+            if (busca == -1):
+                if (self.memoriaNUF.numElem == self.memoriaNUF.numPag):
+                    self.memoriaNUF.removePagina(0) # assume que o vetor está corretamente ordenado
+                
+                self.memoriaNUF.addPagina(acessos[i], tempoNUF)
+                self.memoriaNUF.orderNUF()
+                self.numTrocasNUF += 1
+            
+            busca = self.memoriaNUF.buscaPagina(acessos[i])
+            self.memoriaNUF.memoria[busca].setUltimoAcesso(tempoNUF) # não serve para nada, refatorar eventualmente
+            self.memoriaNUF.memoria[busca].numAcessos += 1
+
+            tempoNUF += 1
+
+        print("\n")
+        print(f"Trocas NUF: {self.numTrocasNUF}")
+        print("Memória NUF final: ", end="")
+        self.memoriaNUF.printMem()
 
     def Otimo(self, processo):
         pass

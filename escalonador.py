@@ -204,6 +204,7 @@ class Escalonador(QThread):
                 print(f"Processo {vetprocessos[j].PID} executando")
                 print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
                 
+                self.gerente.requireMem(vetprocessos[j])
                 if (self.cpufrac < vetprocessos[j].tempoRestante):
                     self.cpuTime += self.cpufrac
                     vetprocessos[j].tempoRestante -= self.cpufrac
@@ -251,6 +252,7 @@ class Escalonador(QThread):
                 print(f"Processo {prioridade.PID} executando")
                 print(f"Tempo restante: {prioridade.tempoRestante}")
 
+                self.gerente.requireMem(prioridade)
                 if (self.cpufrac < prioridade.tempoRestante):
                     prioridade.tempoRestante -= self.cpufrac
                     self.cpuTime += self.cpufrac
@@ -297,6 +299,7 @@ class Escalonador(QThread):
             text = f"Processo {escolhido.PID} executando\nTempo restante: {escolhido.tempoRestante}"
             self.text_changed.emit(text)
 
+            self.gerente.requireMem(escolhido)
             if (self.cpufrac < escolhido.tempoRestante):
                 escolhido.tempoRestante -= self.cpufrac
                 self.cpuTime += self.cpufrac
