@@ -10,6 +10,7 @@ class Pagina:
         self.index = index
         self.ultimoAcesso = ultimoAcesso
         self.tempoEntrada = tempoEntrada
+        self.numUsos = 0 # usado apenas para o nuf
     
     def setUltimoAcesso(self, tempo):
         self.ultimoAcesso = tempo
@@ -26,6 +27,10 @@ class Memoria:
 
     def getTamMem(self):
         return self.tamMem
+    
+    def printMem(self):
+        for i in range(0, self.numPag):
+            print(f"{self.memoria[i].index} ", end="")
     
     def addPagina(self, index, tempo):
         '''Adiciona o indice na primeira pagina vazia que achar'''
@@ -113,7 +118,10 @@ class GerenciadorDeMemoria():
 
             # Pseudo código: processo faz uso do que precisar da memória aqui
         
+        print("\n")
         print(f"Trocas FIFO: {self.numTrocasFIFO}")
+        print("Memória FIFO final: ", end="")
+        self.memoriaFIFO.printMem()
 
 
     def MRU(self, processo):
@@ -138,7 +146,10 @@ class GerenciadorDeMemoria():
 
             tempoMRU += 1
         
+        print("\n")
         print(f"Trocas MRU: {self.numTrocasMRU}")
+        print("Memória MRU final: ", end="")
+        self.memoriaMRU.printMem()
 
     def NUF(self, processo):
         pass
