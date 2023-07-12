@@ -9,7 +9,6 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 
 from gerenciadorDeMemoria import *
-from gerenciadorDeMemoria import GerenciadorDeMemoria # só pra concertar um bug do intellisense
 
 memPol = None # Política de memória, local ou global
 tamMem = None # Tamanho da memória
@@ -342,7 +341,7 @@ class Escalonador(QThread):
             self.text_changed.emit(text)
 
             # REQUERIR MEMÓRIA PARA O PROCESSO ANTES DE EXECUTAR
-            self.gerente.requireMem(prioridade, self.cpuTime)
+            self.gerente.requireMem(prioridade)
 
             if (self.cpufrac < prioridade.tempoRestante):
                 prioridade.tempoRestante -= self.cpufrac
