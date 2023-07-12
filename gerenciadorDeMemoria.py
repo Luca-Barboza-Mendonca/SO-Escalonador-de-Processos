@@ -162,10 +162,20 @@ class GerenciadorDeMemoria():
         self.memoriaMRU.printMem()
 
     def NUF(self, processo):
+
+        vetDisco = [] # guardar valores de numUsos para páginas que saem da memória
         global tempoNUF
         # tempoNUF não faz nada atualmente
         acessos = processo.sequenciaMemoria
         tam = len(acessos)
+        def buscarDisco(ind):
+            '''OBS: NECESSITA DE VALIDAÇÃO'''
+            for i in range(0, len(vetDisco)):
+                if (vetDisco[i].index == ind):
+                    r = deepcopy(vetDisco[i])
+                    vetDisco.pop(i)
+                    return r
+            return -1
 
         for i in range(0, tam):
             self.memoriaNUF.orderNUF()
@@ -173,9 +183,16 @@ class GerenciadorDeMemoria():
 
             if (busca == -1):
                 if (self.memoriaNUF.numElem == self.memoriaNUF.numPag):
+                    vetDisco.append(deepcopy(self.memoriaNUF.memoria[0]))
                     self.memoriaNUF.removePagina(0) # assume que o vetor está corretamente ordenado, também assume que não há página vazia, garantido pelo if
-                
-                self.memoriaNUF.addPagina(acessos[i], tempoNUF)
+                pagDisco = buscarDisco(acessos[i] != -1)
+                if buscarDisco(acessos[i] == -1):
+                    self.memoriaNUF.addPagina(acessos[i], tempoNUF)
+                else:
+                    self.memoriaNUF.addPagina(pagDisco.index, tempoNUF)
+                    busca = self.memoriaNUF.buscaPagina(pagDisco.index)
+                    self.memoriaNUF.memoria[busca].numAcessos = pagDisco.numAcessos
+
                 self.memoriaNUF.orderNUF()
                 self.numTrocasNUF += 1
             
