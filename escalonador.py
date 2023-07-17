@@ -224,6 +224,7 @@ class Escalonador(QThread):
 
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.gerente.outputMem()
         self.text_changed.emit(text)
         os.system("cls")
 
@@ -274,6 +275,7 @@ class Escalonador(QThread):
         # file.close()
         print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.gerente.outputMem()
         self.text_changed.emit(text)
         os.system("cls")
     
@@ -324,6 +326,7 @@ class Escalonador(QThread):
         
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        self.gerente.outputMem()
         self.text_changed.emit(text)
     
     def CFS(self):
@@ -364,7 +367,7 @@ class Escalonador(QThread):
             if (self.test):
                 time.sleep(1)
 
-        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
         self.text_changed.emit(text)
 
     def run(self):

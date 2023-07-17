@@ -65,7 +65,8 @@ class Memoria:
         self.memoria = sorted(self.memoria, key=lambda x: x.ultimoAcesso)
     
     def orderNUF(self):
-        self.memoria = sorted(self.memoria, key=lambda x: x.numAcessos)
+        '''Ordena primeiro pelo numero de acessos, caso duas páginas tenham o número de acesso igual, ordena pelo id'''
+        self.memoria = sorted(self.memoria, key=lambda x: (x.numAcessos, x.index))
 
     def orderOtimo(self):
         self.memoria = sorted(self.memoria, key=lambda x: x.proxUso, reverse=True)
@@ -128,10 +129,10 @@ class GerenciadorDeMemoria():
 
             # Pseudo código: processo faz uso do que precisar da memória aqui
         
-        print("\n")
-        print(f"Trocas FIFO: {self.numTrocasFIFO}")
-        print("Memória FIFO final: ", end="")
-        self.memoriaFIFO.printMem()
+        # print("\n")
+        # print(f"Trocas FIFO: {self.numTrocasFIFO}")
+        # print("Memória FIFO final: ", end="")
+        # self.memoriaFIFO.printMem()
 
 
     def MRU(self, processo):
@@ -156,10 +157,10 @@ class GerenciadorDeMemoria():
 
             tempoMRU += 1
         
-        print("\n")
-        print(f"Trocas MRU: {self.numTrocasMRU}")
-        print("Memória MRU final: ", end="")
-        self.memoriaMRU.printMem()
+        # print("\n")
+        # print(f"Trocas MRU: {self.numTrocasMRU}")
+        # print("Memória MRU final: ", end="")
+        # self.memoriaMRU.printMem()
 
     def NUF(self, processo):
 
@@ -202,10 +203,10 @@ class GerenciadorDeMemoria():
 
             tempoNUF += 1
 
-        print("\n")
-        print(f"Trocas NUF: {self.numTrocasNUF}")
-        print("Memória NUF final: ", end="")
-        self.memoriaNUF.printMem()
+        # print("\n")
+        # print(f"Trocas NUF: {self.numTrocasNUF}")
+        # print("Memória NUF final: ", end="")
+        # self.memoriaNUF.printMem()
 
     def Otimo(self, processo):
         '''Quando há necessidade de troca, encontrar o elemnto que está na memória e que falta a maior quantidade de tempo para ser necessário
@@ -242,7 +243,26 @@ class GerenciadorDeMemoria():
             tempoOtimo += 1
 
         
-        print("\n")
-        print(f"Trocas Otimo: {self.numTrocasOtimo}")
-        print("Memória Otimo final: ", end="")
-        self.memoriaOtimo.printMem()
+        # print("\n")
+        # print(f"Trocas Otimo: {self.numTrocasOtimo}")
+        # print("Memória Otimo final: ", end="")
+        # self.memoriaOtimo.printMem()
+    def medirMelhorAlgo(self):
+        dictTrocas = {'FIFO': int(self.numTrocasFIFO), 'MRU': int(self.numTrocasMRU), 'NUF': int(self.numTrocasNUF)}
+        menor = float('inf')
+        menorNome = list(dictTrocas.keys())[0]
+        for key, value in dictTrocas.items():
+            if value < menor:
+                menor = value
+                menorNome = key
+            elif value == menor:
+                return 'Empate'
+        return menorNome
+    
+    def outputMem(self):
+        minAlgo = self.medirMelhorAlgo()
+        
+        print(f"{self.numTrocasFIFO}|{self.numTrocasMRU}|{self.numTrocasNUF}|{self.numTrocasOtimo}|{minAlgo}")
+        os.system('cls')
+        
+        return f"{self.numTrocasFIFO}|{self.numTrocasMRU}|{self.numTrocasNUF}|{self.numTrocasOtimo}|{minAlgo}"
