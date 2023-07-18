@@ -1,1 +1,2 @@
-processo1 encerrou em 20
+processo1 encerrou em 30
+processo2 encerrou em 40
