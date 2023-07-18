@@ -222,11 +222,8 @@ class Escalonador(QThread):
                     time.sleep(1)
                 os.system("cls")
 
-        print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
-        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
-        self.gerente.outputMem()
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
         self.text_changed.emit(text)
-        os.system("cls")
 
     
     def prioridade(self):
@@ -273,11 +270,8 @@ class Escalonador(QThread):
             
             
         # file.close()
-        print(f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}")
-        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
-        self.gerente.outputMem()
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
         self.text_changed.emit(text)
-        os.system("cls")
     
     def loteria(self):
         '''É escolhido um processo dentro do vetor de processos a partir de uma escolha aleatória com pesos, em que a probabilidade de um processo ser escolhido depende
@@ -325,8 +319,7 @@ class Escalonador(QThread):
                 time.sleep(1)
         
 
-        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}"
-        self.gerente.outputMem()
+        text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
         self.text_changed.emit(text)
     
     def CFS(self):
