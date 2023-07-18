@@ -79,8 +79,8 @@ class GerenciadorDeMemoria():
         self.memoriaNUF = Memoria(tamMem, tamPag)
         self.memoriaOtimo = Memoria(tamMem, tamPag)
 
-
-        self.percAloc = percAloc # Lembrar de implementar mais tarde
+        self.numPag = tamMem//tamPag
+        self.percAloc = percAloc 
         self.memPol = memPol
         self.acessosPorCiclo = acessosPorCiclo
 
@@ -134,6 +134,10 @@ class GerenciadorDeMemoria():
         # print("Memória FIFO final: ", end="")
         # self.memoriaFIFO.printMem()
 
+        self.memoriaFIFO.memoria = [Pagina(-1, 0, 0)] * (self.numPag)
+        self.memoriaFIFO.numElem = 0
+        tempoFIFO = 0
+
 
     def MRU(self, processo):
         global tempoMRU
@@ -162,6 +166,10 @@ class GerenciadorDeMemoria():
         # print("Memória MRU final: ", end="")
         # self.memoriaMRU.printMem()
 
+        self.memoriaMRU.memoria = [Pagina(-1, 0, 0)] * (self.numPag)
+        self.memoriaMRU.numElem = 0
+        tempoMRU =0
+
     def NUF(self, processo):
 
         vetDisco = [] # guardar valores de numUsos para páginas que saem da memória
@@ -170,7 +178,6 @@ class GerenciadorDeMemoria():
         acessos = processo.sequenciaMemoria
         tam = len(acessos)
         def buscarDisco(ind):
-            '''OBS: NECESSITA DE VALIDAÇÃO'''
             for i in range(0, len(vetDisco)):
                 if (vetDisco[i].index == ind):
                     r = deepcopy(vetDisco[i])
@@ -207,6 +214,10 @@ class GerenciadorDeMemoria():
         # print(f"Trocas NUF: {self.numTrocasNUF}")
         # print("Memória NUF final: ", end="")
         # self.memoriaNUF.printMem()
+
+        self.memoriaNUF.memoria = [Pagina(-1, 0, 0)] * (self.numPag)
+        self.memoriaNUF.numElem = 0
+        tempoNUF = 0
 
     def Otimo(self, processo):
         '''Quando há necessidade de troca, encontrar o elemnto que está na memória e que falta a maior quantidade de tempo para ser necessário
@@ -247,6 +258,10 @@ class GerenciadorDeMemoria():
         # print(f"Trocas Otimo: {self.numTrocasOtimo}")
         # print("Memória Otimo final: ", end="")
         # self.memoriaOtimo.printMem()
+
+        self.memoriaOtimo.memoria = [Pagina(-1, 0, 0)] * (self.numPag)
+        self.memoriaOtimo.numElem = 0
+
     def medirMelhorAlgo(self):
         dictTrocas = {'FIFO': int(self.numTrocasFIFO), 'MRU': int(self.numTrocasMRU), 'NUF': int(self.numTrocasNUF)}
         menor = float('inf')
@@ -256,7 +271,7 @@ class GerenciadorDeMemoria():
                 menor = value
                 menorNome = key
             elif value == menor:
-                return 'Empate'
+                menorNome = 'Empate'
         return menorNome
     
     def outputMem(self):
