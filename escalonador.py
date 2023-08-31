@@ -1,6 +1,7 @@
 import time
 import os
 import sys
+import random
 from copy import deepcopy
 from random import choices
 from sortedcontainers import SortedKeyList
@@ -15,15 +16,18 @@ tamMem = None # Tamanho da memória
 tamPag = None # Tamanho das página e molduras
 percAloc = None # Percentual máximo de memória que um processo pode ter na memória principal
 acessosPorCiclo = None # Acessos á memória por ciclo de cpu
+numDispositivos = None # Numero de dispositivos de E/S
 
 vetprocessos = None
 totalCpuTimeLeft = 0
 vetpesos = [] # Só para o algoritmo de loteria
 algo = 1
 
+tempo = 0
+
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
-    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria, sequenciaMemoria):
+    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria, sequenciaMemoria, chance):
         self.nome = nome
         self.PID = PID
         self.tempoRestante = tempoRestante
@@ -32,6 +36,8 @@ class Processo:
         self.memoria = memoria
         self.sequenciaMemoria = sequenciaMemoria
         self.tempoRecebido = 0
+        self.chanceBloquear = chance
+        self.pronto = True # True para pronto, False para bloqueado
 
 def initProcessos(modo):
     '''criar um vetor global para guardar os processos, esse deve ser atualizado pelo input do usuário.
@@ -57,7 +63,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
             vetprocessos.append(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
@@ -80,7 +86,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
             vetprocessos.append(processo)
             vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
             totalCpuTimeLeft += int(x[2])
@@ -104,7 +110,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
             vetprocessos.append(processo)
             vetpesos.append(int(x[3]))  # guarda o peso do processo i na posição i
             totalCpuTimeLeft += int(x[2])
@@ -128,7 +134,7 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
             vetprocessos.add(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
@@ -139,7 +145,7 @@ def initProcessos(modo):
 def addProcesso(proc):
     '''Adicionar um processo específicado pelo usuário ao vetor global'''
     x = proc.split("|")
-    processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))))
+    processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
     global vetprocessos
     global totalCpuTimeLeft
 
@@ -203,16 +209,28 @@ class Escalonador(QThread):
                 self.text_changed.emit(text)
                 print(f"Processo {vetprocessos[j].PID} executando")
                 print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
+
+                rand_numb = random.randint(1, 100)
+                if (rand_numb <= vetprocessos[j].chanceBloquear):
+                    # Run I/O manager
+                    global numDispositivos
+                    dispositivo = random.randint(1, numDispositivos)
+                    
                 
                 self.gerente.requireMem(vetprocessos[j])
                 if (self.cpufrac < vetprocessos[j].tempoRestante):
                     self.cpuTime += self.cpufrac
                     vetprocessos[j].tempoRestante -= self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
+                    global tempo
+                    tempo += self.cpufrac
                 elif (self.cpufrac >= vetprocessos[j].tempoRestante):
                     self.cpuTime += vetprocessos[j].tempoRestante
                     totalCpuTimeLeft -= vetprocessos[j].tempoRestante
                     vetprocessos[j].tempoRestante = 0
+
+                    global tempo
+                    tempo += vetprocessos[j].tempoRestante
 
                     fout = open("output.txt", "a")
                     fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
@@ -378,13 +396,18 @@ class Escalonador(QThread):
         global tamPag
         global percAloc
         global acessosPorCiclo
+        global numDispositivos
         memPol = tmp[2]
         tamMem = int(tmp[3])
         tamPag = int(tmp[4])
         percAloc = int(tmp[5])
         acessosPorCiclo = int(tmp[6])
+
+        numDispositivos = int(tmp[7])
         self.gerente = GerenciadorDeMemoria(memPol, tamMem, tamPag, percAloc, acessosPorCiclo)
         
+        for i in range(0, numDispositivos):
+            pass
 
         if (metodo == "alternanciaCircular"):
             while True:
