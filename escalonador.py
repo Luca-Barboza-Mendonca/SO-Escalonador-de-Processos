@@ -406,8 +406,9 @@ class Escalonador(QThread):
         numDispositivos = int(tmp[7])
         self.gerente = GerenciadorDeMemoria(memPol, tamMem, tamPag, percAloc, acessosPorCiclo)
         
-        for i in range(0, numDispositivos):
-            pass
+        
+        # chamar inicialização de threads de dispositivos
+        
 
         if (metodo == "alternanciaCircular"):
             while True:
