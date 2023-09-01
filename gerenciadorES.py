@@ -1,13 +1,13 @@
-import typing
-from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from escalonador import *
+from interface import *
 import threading
 
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
 
-def initDispositivo(id, numSimultaneos, tempoOperacao):
+def initDispositivo(id, numSimultaneos, tempoOperacao, numDispositivos):
     # Incializar thread de dispositivo
 
     global dispositivos
@@ -24,3 +24,4 @@ class Dispositivo(QThread):
         self.id = id
         self.numSimultaneos = numSimultaneos
         self.tempoOperacao = tempoOperacao
+        QThread.__init__(self)

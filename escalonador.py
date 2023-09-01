@@ -10,13 +10,16 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 
 from gerenciadorDeMemoria import *
+from interface import *
+from gerenciadorES import *
+from gerenciadorES import initDispositivo
+from util import makeInput
 
 memPol = None # Política de memória, local ou global
 tamMem = None # Tamanho da memória
 tamPag = None # Tamanho das página e molduras
 percAloc = None # Percentual máximo de memória que um processo pode ter na memória principal
 acessosPorCiclo = None # Acessos á memória por ciclo de cpu
-numDispositivos = None # Numero de dispositivos de E/S
 
 vetprocessos = None
 totalCpuTimeLeft = 0
@@ -55,6 +58,11 @@ def initProcessos(modo):
         file = open("input.txt", "r")
         tmp = "placeholder"
         tmp = file.readline()
+        tmp = tmp.split("|")
+        tmp[7] = tmp[7].replace("\n", '')
+
+        for i in range(0, int(tmp[7])):
+            tmp = file.readline()
 
         i = 0
 
@@ -79,6 +87,11 @@ def initProcessos(modo):
         tmp = "placeholder"
         file = open("input.txt", "r")
         tmp = file.readline()
+        tmp = tmp.split("|")
+        tmp[7] = tmp[7].replace("\n", '')
+
+        for i in range(0, int(tmp[7])):
+            tmp = file.readline()
 
         i = 0
         while (tmp != ""):
@@ -101,6 +114,11 @@ def initProcessos(modo):
         tmp = "placeholder"
         file = open("input.txt", "r")
         tmp = file.readline()
+        tmp = tmp.split("|")
+        tmp[7] = tmp[7].replace("\n", '')
+
+        for i in range(0, int(tmp[7])):
+            tmp = file.readline()
         
         i = 0
         totalCpuTimeLeft = 0
@@ -123,8 +141,7 @@ def initProcessos(modo):
         tmp = "placeholder"
         vetprocessos = SortedKeyList(key=lambda x: x.tempoRecebido)
         
-        file = open("input.txt", "r")
-        tmp = file.readline()
+        file = makeInput()
         
         i = 0
         totalCpuTimeLeft = 0
@@ -153,7 +170,6 @@ def addProcesso(proc):
     if algo == 1:
         vetprocessos.append(processo)
     elif algo == 2:
-        print("test algo 2")
         vetprocessos.append(processo)
         vetprocessos = sorted(vetprocessos, key=lambda x: x.prioridade, reverse=True)
     elif algo == 3:
@@ -195,7 +211,7 @@ class Escalonador(QThread):
         global totalCpuTimeLeft
 
         initProcessos(1) # inicializar o vetor global em modo alternância circular
-
+        global tempo
         j = 0
         while (totalCpuTimeLeft > 0):
             #executar escalonamento
@@ -222,14 +238,13 @@ class Escalonador(QThread):
                     self.cpuTime += self.cpufrac
                     vetprocessos[j].tempoRestante -= self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
-                    global tempo
+                    
                     tempo += self.cpufrac
                 elif (self.cpufrac >= vetprocessos[j].tempoRestante):
                     self.cpuTime += vetprocessos[j].tempoRestante
                     totalCpuTimeLeft -= vetprocessos[j].tempoRestante
                     vetprocessos[j].tempoRestante = 0
 
-                    global tempo
                     tempo += vetprocessos[j].tempoRestante
 
                     fout = open("output.txt", "a")
@@ -388,6 +403,7 @@ class Escalonador(QThread):
         file = open(self.input, "r")
         line = file.readline()
         tmp = line.split("|")
+        tmp[7] = tmp[7].replace("\n", '')
         metodo = tmp[0]
         self.cpufrac = int(tmp[1])
 
@@ -396,7 +412,6 @@ class Escalonador(QThread):
         global tamPag
         global percAloc
         global acessosPorCiclo
-        global numDispositivos
         memPol = tmp[2]
         tamMem = int(tmp[3])
         tamPag = int(tmp[4])
@@ -408,6 +423,14 @@ class Escalonador(QThread):
         
         
         # chamar inicialização de threads de dispositivos
+        for i in range(0, numDispositivos):
+            line = file.readline()
+            line = line.split("|")
+            id = int(line[0])
+            numSimultaneos = int(line[1])
+            tempoOp = int(line[2])
+
+            initDispositivo(id, numSimultaneos, tempoOp, numDispositivos)
         
 
         if (metodo == "alternanciaCircular"):
