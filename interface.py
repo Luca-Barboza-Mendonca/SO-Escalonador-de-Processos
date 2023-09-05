@@ -56,6 +56,19 @@ class Interface(QMainWindow):
         self.listwidget.repaint()
 
         self.listwidget.setCurrentItem(item)
+    
+    def setCurrentItem(self, index_to_set):
+        # Set the current item to a specific index (e.g., index 1)
+
+        if 0 <= index_to_set < self.listwidget.count():
+            item_to_set = self.listwidget.item(index_to_set)
+            self.listwidget.setCurrentItem(item_to_set)
+    
+    def updateItem(self, newText):
+        selected_item = self.list_widget.currentItem()
+
+        if selected_item:
+            selected_item.setText(newText)
 
 def main():
     file = open("output.txt", "w")
@@ -64,8 +77,8 @@ def main():
 
     app = QApplication([])
     window = Interface()
-    for i in range(0, 100):
-        window.insertItem(str(i))
+    # for i in range(0, 100):
+    #     window.insertItem(str(i))
     window.show()
 
     sys.exit(app.exec())
