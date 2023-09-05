@@ -1,2 +1,2 @@
-CFS 20 local 2048 512 75 2 3
+alternanciaCircular 20 local 2048 512 75 2 3
  

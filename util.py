@@ -2,6 +2,8 @@ def makeInput():
     
     file = open("input.txt", 'r')
     tmp = file.readline()
+    if tmp == '':
+        return file
     tmp = tmp.split('|')
 
     str = ''
@@ -13,9 +15,9 @@ def makeInput():
     log.write(str)
     log.close()
 
-    # numDisp = int(tmp[7])
+    numDisp = int(tmp[7])
 
-    # for i in range(0, numDisp):
-    #     file.readline()
+    for i in range(0, numDisp):
+        file.readline()
 
     return file

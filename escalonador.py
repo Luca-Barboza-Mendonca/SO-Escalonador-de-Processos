@@ -20,6 +20,7 @@ tamMem = None # Tamanho da memória
 tamPag = None # Tamanho das página e molduras
 percAloc = None # Percentual máximo de memória que um processo pode ter na memória principal
 acessosPorCiclo = None # Acessos á memória por ciclo de cpu
+numDispositivos = None
 
 vetprocessos = None
 totalCpuTimeLeft = 0
@@ -53,16 +54,10 @@ def initProcessos(modo):
     if modo == 1:
 
         # Alternância circular
+        tmp = 'placeholder'
         vetprocessos = []
 
-        file = open("input.txt", "r")
-        tmp = "placeholder"
-        tmp = file.readline()
-        tmp = tmp.split("|")
-        tmp[7] = tmp[7].replace("\n", '')
-
-        for i in range(0, int(tmp[7])):
-            tmp = file.readline()
+        file = makeInput()
 
         i = 0
 
@@ -85,13 +80,7 @@ def initProcessos(modo):
         
         vetprocessos = []
         tmp = "placeholder"
-        file = open("input.txt", "r")
-        tmp = file.readline()
-        tmp = tmp.split("|")
-        tmp[7] = tmp[7].replace("\n", '')
-
-        for i in range(0, int(tmp[7])):
-            tmp = file.readline()
+        file = makeInput()
 
         i = 0
         while (tmp != ""):
@@ -112,13 +101,7 @@ def initProcessos(modo):
         global vetpesos
         vetprocessos = []
         tmp = "placeholder"
-        file = open("input.txt", "r")
-        tmp = file.readline()
-        tmp = tmp.split("|")
-        tmp[7] = tmp[7].replace("\n", '')
-
-        for i in range(0, int(tmp[7])):
-            tmp = file.readline()
+        file = makeInput()
         
         i = 0
         totalCpuTimeLeft = 0
@@ -412,6 +395,7 @@ class Escalonador(QThread):
         global tamPag
         global percAloc
         global acessosPorCiclo
+        global numDispositivos
         memPol = tmp[2]
         tamMem = int(tmp[3])
         tamPag = int(tmp[4])

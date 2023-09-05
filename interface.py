@@ -50,19 +50,6 @@ class Interface(QMainWindow):
         self.listwidget.addItem(item)
         self.listwidget.repaint()
 
-# memPol = None # Política de memória, local ou global
-# tamMem = None # Tamanho da memória
-# tamPag = None # Tamanho das página e molduras
-# percAloc = None # Percentual máximo de memória que um processo pode ter na memória principal
-# acessosPorCiclo = None # Acessos á memória por ciclo de cpu
-
-# vetprocessos = None
-# totalCpuTimeLeft = 0
-# vetpesos = [] # Só para o algoritmo de loteria
-# algo = 1
-
-# tempo = 0
-
 def main():
     file = open("output.txt", "w")
     file.write("")
