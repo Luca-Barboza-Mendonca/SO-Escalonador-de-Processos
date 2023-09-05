@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QListWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
 from escalonador import *
 
 class Interface(QMainWindow):
@@ -8,7 +9,7 @@ class Interface(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Escalonador")
-        self.setGeometry(10,10,800,280)
+        self.setGeometry(100,100,1000,780)
 
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignCenter)
@@ -26,10 +27,13 @@ class Interface(QMainWindow):
         self.threadEscalonador.start()
 
         self.textbox = QLineEdit(self)
-        self.textbox.move(265, 20)
+        self.textbox.move(350, 20)
         self.textbox.resize(280,40)
 
         self.listwidget = QListWidget()
+        
+        self.listwidget.setMaximumWidth(1000)
+        self.listwidget.setMaximumHeight(500)
         layout.addWidget(self.listwidget)
 
         self.button = QPushButton('Adicionar processo', self)
@@ -57,7 +61,6 @@ def main():
 
     app = QApplication([])
     window = Interface()
-    window.insertItem("1 20")
     window.show()
 
     sys.exit(app.exec())
