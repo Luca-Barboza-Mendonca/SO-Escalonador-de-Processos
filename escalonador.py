@@ -144,8 +144,11 @@ def initProcessos(modo):
 
 def addProcesso(proc):
     '''Adicionar um processo específicado pelo usuário ao vetor global'''
-    x = proc.split("|")
-    processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
+    try:
+        x = proc.split("|")
+        processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
+    except:
+        return False
     global vetprocessos
     global totalCpuTimeLeft
 

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget, QListWidget
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, QListWidgetItem
 from escalonador import *
 
 class Interface(QMainWindow):
@@ -49,7 +49,8 @@ class Interface(QMainWindow):
         # file = open("userinput.txt", "a")
         # file.write(textboxValue + "\n")
 
-    def insertItem(self, item):
+    def insertItem(self, line):
+        item = QListWidgetItem(line)
 
         self.listwidget.addItem(item)
         self.listwidget.repaint()
@@ -61,6 +62,8 @@ def main():
 
     app = QApplication([])
     window = Interface()
+    for i in range(0, 100):
+        window.insertItem(str(i))
     window.show()
 
     sys.exit(app.exec())
