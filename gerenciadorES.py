@@ -1,20 +1,19 @@
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from escalonador import *
 from interface import *
-import threading
-
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
 
-def initDispositivo(id, numSimultaneos, tempoOperacao, numDispositivos):
+def initDispositivo(id, numSimultaneos, tempoOperacao):
     # Incializar thread de dispositivo
 
     global dispositivos
+    global window
     
-    for i in range(0, numDispositivos):
-        thread = Dispositivo(id, numSimultaneos, tempoOperacao)
-        dispositivos.append(thread)
+    thread = Dispositivo(id, numSimultaneos, tempoOperacao)
+    dispositivos.append(thread)
+    return thread.__str__()
 
 class Dispositivo(QThread):
 
@@ -24,4 +23,8 @@ class Dispositivo(QThread):
         self.id = id
         self.numSimultaneos = numSimultaneos
         self.tempoOperacao = tempoOperacao
+        self.usoAtual = 0
         QThread.__init__(self)
+
+    def __str__(self):
+        return f"Dispositivo {self.id} Uso Máximo: {self.numSimultaneos} Uso Atual: {self.usoAtual}"

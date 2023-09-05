@@ -1,7 +1,10 @@
 from PyQt5 import QtCore
+import sys
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QListWidget
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, QListWidgetItem
 from escalonador import *
+
 
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
@@ -22,9 +25,7 @@ class Interface(QMainWindow):
         layout.addWidget(self.label)
         central_widget.setLayout(layout)
         
-        self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
-        self.threadEscalonador.text_changed.connect(self.label.setText)
-        self.threadEscalonador.start()
+
 
         self.textbox = QLineEdit(self)
         self.textbox.move(350, 20)
@@ -40,6 +41,11 @@ class Interface(QMainWindow):
         self.button.move(20,80)
         self.button.clicked.connect(self.on_click)
         layout.addWidget(self.button)
+
+        self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
+        self.threadEscalonador.text_changed.connect(self.label.setText)
+        self.threadEscalonador.device_added.connect(self.insertItem)
+        self.threadEscalonador.start()
     
     def on_click(self):
         textboxValue = self.textbox.text()
@@ -74,8 +80,9 @@ def main():
     file = open("output.txt", "w")
     file.write("")
     file.close()
-
+    global window
     app = QApplication([])
+    
     window = Interface()
     # for i in range(0, 100):
     #     window.insertItem(str(i))

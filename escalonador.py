@@ -172,6 +172,7 @@ class Escalonador(QThread):
     '''Classe escalonador que roda como um thread, permitindo paralelismo na interface gráfica. Muito do código entre os diferentes algoritmos é repetido, isso é proposital
     para garantir modularidade entre os métodos de escalonamento, caso trabalhos futuros tenham o escopo de expandir essa implementação.'''
     text_changed = pyqtSignal(str)
+    device_added = pyqtSignal(str)
 
     def __init__(self, inp, test=False):
         self.input = inp
@@ -417,8 +418,8 @@ class Escalonador(QThread):
             numSimultaneos = int(line[1])
             tempoOp = int(line[2])
 
-            initDispositivo(id, numSimultaneos, tempoOp, numDispositivos)
-        
+            device = initDispositivo(id, numSimultaneos, tempoOp)
+            self.device_added.emit(device)
 
         if (metodo == "alternanciaCircular"):
             while True:
