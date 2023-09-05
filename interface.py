@@ -55,6 +55,8 @@ class Interface(QMainWindow):
         self.listwidget.addItem(item)
         self.listwidget.repaint()
 
+        self.listwidget.setCurrentItem(item)
+
 def main():
     file = open("output.txt", "w")
     file.write("")
