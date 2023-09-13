@@ -1,2 +1,0 @@
-processo1 encerrou em 20
-processo2 encerrou em 40

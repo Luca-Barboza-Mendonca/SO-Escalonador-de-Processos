@@ -173,6 +173,7 @@ class Escalonador(QThread):
     para garantir modularidade entre os métodos de escalonamento, caso trabalhos futuros tenham o escopo de expandir essa implementação.'''
     text_changed = pyqtSignal(str)
     device_added = pyqtSignal(str)
+    device_changed = pyqtSignal(str, int)
 
     def __init__(self, inp, test=False):
         self.input = inp
@@ -204,7 +205,7 @@ class Escalonador(QThread):
             #executar escalonamento
 
             j = 0
-            for j in range(0, len(vetprocessos)):
+            while (len(vetprocessos) > 0):
                 if (vetprocessos[j].tempoRestante == 0):
                     continue
                 # Emitindo os resultados para a interface
@@ -217,7 +218,18 @@ class Escalonador(QThread):
                 if (rand_numb <= vetprocessos[j].chanceBloquear):
                     # Run I/O manager
                     global numDispositivos
-                    dispositivo = random.randint(1, numDispositivos)
+                    global dispositivos
+                    dispositivo = random.randint(0, numDispositivos-1) # Escolher qual dispositivo utilizar
+                    proc = deepcopy(vetprocessos[j])
+                    dispositivos[dispositivo].addProcesso(proc)
+                    self.device_changed.emit(dispositivos[dispositivo].__str__(), dispositivo)
+                    
+                    totalCpuTimeLeft -= vetprocessos[j].tempoRestante # REMOVER ESSA LINHA APÓS E/S IMPLEMENTADO
+                    
+                    vetprocessos.pop(j)
+
+                    
+                    continue # rodar próximo processo
                     
                 
                 self.gerente.requireMem(vetprocessos[j])
@@ -237,6 +249,8 @@ class Escalonador(QThread):
                     fout = open("output.txt", "a")
                     fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
                     fout.close()
+                    
+                    vetprocessos.pop(j)
 
                 if (self.test):
                     time.sleep(1)

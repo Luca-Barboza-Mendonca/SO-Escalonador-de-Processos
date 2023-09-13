@@ -46,6 +46,7 @@ class Interface(QMainWindow):
         self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.device_added.connect(self.insertItem)
+        self.threadEscalonador.device_changed.connect(self.updateItem)
         self.threadEscalonador.start()
     
     def on_click(self):
@@ -71,8 +72,9 @@ class Interface(QMainWindow):
             item_to_set = self.listwidget.item(index_to_set)
             self.listwidget.setCurrentItem(item_to_set)
     
-    def updateItem(self, newText):
-        selected_item = self.list_widget.currentItem()
+    def updateItem(self, newText, index):
+        self.setCurrentItem(index)
+        selected_item = self.listwidget.currentItem()
 
         if selected_item:
             selected_item.setText(newText)
