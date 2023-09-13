@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 import sys
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QListWidget
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, QListWidgetItem
@@ -28,20 +29,20 @@ class Interface(QMainWindow):
 
 
         self.textbox = QLineEdit(self)
-        self.textbox.move(350, 20)
+        self.textbox.move(350, 40)
         self.textbox.resize(280,40)
 
         self.listwidget = QListWidget()
         
         self.listwidget.setMaximumWidth(1000)
         self.listwidget.setMaximumHeight(500)
-        layout.addWidget(self.listwidget)
+        
 
         self.button = QPushButton('Adicionar processo', self)
-        self.button.move(20,80)
         self.button.clicked.connect(self.on_click)
         layout.addWidget(self.button)
-
+        layout.addWidget(self.listwidget)
+        
         self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.device_added.connect(self.insertItem)
