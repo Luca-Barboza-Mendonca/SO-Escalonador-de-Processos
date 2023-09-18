@@ -1,8 +1,12 @@
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
-from interface import *
+from util import writeLog, lerTempo
+import threading
+import escalonador
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
+
+lock = threading.Lock()
 
 tempo = 0
 
@@ -27,61 +31,56 @@ class Dispositivo(QThread):
         self.usoAtual = 0
         self.processosAtual = [None] * numSimultaneos
 
-
-        for i in range(0, len(self.processosAtual)):
-            if self.processosAtual[i] != None:
-                self.processosAtual[i].IOend.connect(self.liberarProcesso)
         QThread.__init__(self)
 
     def __str__(self):
         return f"Dispositivo {self.id} Uso Máximo: {self.numSimultaneos} Uso Atual: {self.usoAtual}"
     
     def addProcesso(self, processo):
+        tempo = lerTempo()
+        writeLog(f"Processo {processo.nome} entrou em ES no tempo {tempo}")
         if self.usoAtual > self.numSimultaneos:
+            writeLog(f"Dispositivo {self.id} sobrecarregado, negando ES")
             return False
         for i in range(0, len(self.processosAtual)):
             if self.processosAtual[i] == None:
-                self.processosAtual[i] = IODispositivo(i, processo, self.tempoOperacao)
+                self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
                 self.processosAtual[i].start()
                 self.usoAtual += 1
 
                 return True
             try:
-                if self.processosAtual[i].isActive == False:
-                    self.processosAtual[i] = IODispositivo(i, processo, self.tempoOperacao)
+                if self.processosAtual[i].is_alive() == False:
+                    self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
                     self.processosAtual[i].start()
             except:
                 pass
-    def liberarProcesso(self, index):
-        processo = self.processosAtual[index]
+        return False
+    def liberarProcesso(self, index, processo):
+        writeLog(f"Dispositivo {self.id} liberando processo {processo.nome}")
         global vetprocessos
-        vetprocessos.append(processo.processo)
+        escalonador.vetprocessos.append(processo)
         self.usoAtual -= 1
+        self.processosAtual[index] = None
+        
     
     def run(self):
         # inicializa a thread dispositivo
         return None
 
-class IODispositivo(QThread):
 
-    IOend = pyqtSignal(int)
-
-    def __init__(self, ind, processo, tempoOperacao):
-        self.index = ind
-        self.processo = processo
-        global tempo
-        self.tempoFim = tempo + tempoOperacao
-        self.isActive = True
-        QThread.__init__(self)
-
-    def run(self):
-        global tempo
-        while tempo < self.tempoFim:
-            pass
-
-        self.stop()
-
-    def stop(self):
-        self.isActive = False
-        self.IOend.emit(self.index)
-        return self.tempoFim
+def runIO(deviceID, ind, processo, tempoOperacao):
+    lock.acquire()
+    tempo = lerTempo()
+    tempoFim = tempo + tempoOperacao
+    lock.release()
+    while True:
+        lock.acquire()
+        tempo = lerTempo()
+        print(tempo)
+        if tempo >= tempoFim:
+            dispositivos[deviceID].liberarProcesso(ind, processo)
+            writeLog(f"Processo {processo.nome} terminou ES")
+            break
+        lock.release()
+    return tempoFim

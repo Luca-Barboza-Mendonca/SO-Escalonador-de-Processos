@@ -10,10 +10,8 @@ from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
 
 from gerenciadorDeMemoria import *
-from interface import *
-from gerenciadorES import *
-from gerenciadorES import tempo
-from util import makeInput
+from gerenciadorES import Dispositivo, initDispositivo, lock, dispositivos
+from util import makeInput, incrementarTempo, writeLog
 
 memPol = None # Política de memória, local ou global
 tamMem = None # Tamanho da memória
@@ -195,17 +193,16 @@ class Escalonador(QThread):
         algo = 1
 
         global totalCpuTimeLeft
+        global lock
 
         initProcessos(1) # inicializar o vetor global em modo alternância circular
-        global tempo
         j = 0
         while (totalCpuTimeLeft > 0):
             #executar escalonamento
-
             j = 0
-            while (len(vetprocessos) > 0):
+            while (len(vetprocessos) > 0): # revisar
                 if (vetprocessos[j].tempoRestante == 0):
-                    continue
+                    vetprocessos.pop(j)
                 # Emitindo os resultados para a interface
                 text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
                 self.text_changed.emit(text)
@@ -213,20 +210,20 @@ class Escalonador(QThread):
                 print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
 
                 rand_numb = random.randint(1, 100)
+
+                # rand_numb = 1000 # DESATIVA ES
                 if (rand_numb <= vetprocessos[j].chanceBloquear):
                     # Run I/O manager
                     global numDispositivos
                     global dispositivos
                     dispositivo = random.randint(0, numDispositivos-1) # Escolher qual dispositivo utilizar
                     proc = deepcopy(vetprocessos[j])
-                    dispositivos[dispositivo].addProcesso(proc)
+                    sucesso = dispositivos[dispositivo].addProcesso(proc)
                     self.device_changed.emit(dispositivos[dispositivo].__str__(), dispositivo)
-                    
-                    totalCpuTimeLeft -= vetprocessos[j].tempoRestante # REMOVER ESSA LINHA APÓS E/S IMPLEMENTADO
-                    
-                    vetprocessos.pop(j)
-
-                    
+                    if sucesso:
+                        vetprocessos.pop(j)
+                    # Rever acima, quando o processo não consegue fazer es, ele continua na cpu
+                    print("test")
                     continue # rodar próximo processo
                     
                 
@@ -236,25 +233,34 @@ class Escalonador(QThread):
                     vetprocessos[j].tempoRestante -= self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
                     
-                    tempo += self.cpufrac
+                    lock.acquire()
+                    incrementarTempo(self.cpufrac)
+                    lock.release()
                 elif (self.cpufrac >= vetprocessos[j].tempoRestante):
                     self.cpuTime += vetprocessos[j].tempoRestante
                     totalCpuTimeLeft -= vetprocessos[j].tempoRestante
                     vetprocessos[j].tempoRestante = 0
 
-                    tempo += vetprocessos[j].tempoRestante
-
+                    lock.acquire()
+                    incrementarTempo(self.cpufrac)
+                    lock.release()
                     fout = open("output.txt", "a")
                     fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
                     fout.close()
                     
+                    writeLog(f"Processo {vetprocessos[j].nome} encerrou")
                     vetprocessos.pop(j)
-
+                
                 if (self.test):
                     time.sleep(1)
-                os.system("cls")
+
+            lock.acquire()
+            incrementarTempo(self.cpufrac)
+            lock.release()
 
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
+        if (self.test):
+            time.sleep(1)
         self.text_changed.emit(text)
 
     

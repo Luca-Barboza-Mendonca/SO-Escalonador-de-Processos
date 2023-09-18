@@ -1,4 +1,4 @@
-from escalonador import *
+import os
 from copy import deepcopy
 
 # Luca Barboza Mendonça, 149343

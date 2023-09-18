@@ -1,2 +1,6 @@
-alternanciaCircular 20 local 2048 512 75 2 3
- 
+alternanciaCircular 20 local 2048 512 75 2 1
+ Processo processo1 entrou em ES no tempo 0
+Processo processo2 encerrou
+Dispositivo 0 liberando processo processo1
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 20

@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QWidget, QListWidget
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, QListWidgetItem
 from escalonador import *
 
-
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
     no funcionamento do input de usuário. O código abaixo define apenas o funcionamento da interface, e não tem parte na lógica do escalonador.'''
@@ -43,7 +42,7 @@ class Interface(QMainWindow):
         layout.addWidget(self.button)
         layout.addWidget(self.listwidget)
         
-        self.threadEscalonador = Escalonador("input.txt", False) # mudar o segundo param. para desailitar sleep
+        self.threadEscalonador = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.device_added.connect(self.insertItem)
         self.threadEscalonador.device_changed.connect(self.updateItem)
