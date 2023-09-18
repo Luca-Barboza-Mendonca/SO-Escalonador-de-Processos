@@ -1,9 +1,10 @@
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
-from escalonador import *
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 from interface import *
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
+
+tempo = 0
 
 def initDispositivo(id, numSimultaneos, tempoOperacao):
     # Incializar thread de dispositivo
@@ -25,6 +26,11 @@ class Dispositivo(QThread):
         self.tempoOperacao = tempoOperacao
         self.usoAtual = 0
         self.processosAtual = [None] * numSimultaneos
+
+
+        for i in range(0, len(self.processosAtual)):
+            if self.processosAtual[i] != None:
+                self.processosAtual[i].IOend.connect(self.liberarProcesso)
         QThread.__init__(self)
 
     def __str__(self):
@@ -35,11 +41,47 @@ class Dispositivo(QThread):
             return False
         for i in range(0, len(self.processosAtual)):
             if self.processosAtual[i] == None:
-                self.processosAtual[i] = processo
+                self.processosAtual[i] = IODispositivo(i, processo, self.tempoOperacao)
+                self.processosAtual[i].start()
                 self.usoAtual += 1
 
                 return True
+            try:
+                if self.processosAtual[i].isActive == False:
+                    self.processosAtual[i] = IODispositivo(i, processo, self.tempoOperacao)
+                    self.processosAtual[i].start()
+            except:
+                pass
+    def liberarProcesso(self, index):
+        processo = self.processosAtual[index]
+        global vetprocessos
+        vetprocessos.append(processo.processo)
+        self.usoAtual -= 1
     
     def run(self):
         # inicializa a thread dispositivo
         return None
+
+class IODispositivo(QThread):
+
+    IOend = pyqtSignal(int)
+
+    def __init__(self, ind, processo, tempoOperacao):
+        self.index = ind
+        self.processo = processo
+        global tempo
+        self.tempoFim = tempo + tempoOperacao
+        self.isActive = True
+        QThread.__init__(self)
+
+    def run(self):
+        global tempo
+        while tempo < self.tempoFim:
+            pass
+
+        self.stop()
+
+    def stop(self):
+        self.isActive = False
+        self.IOend.emit(self.index)
+        return self.tempoFim

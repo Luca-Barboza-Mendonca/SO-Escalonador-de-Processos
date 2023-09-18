@@ -12,7 +12,7 @@ from PyQt5.QtGui import QFont
 from gerenciadorDeMemoria import *
 from interface import *
 from gerenciadorES import *
-from gerenciadorES import initDispositivo
+from gerenciadorES import tempo
 from util import makeInput
 
 memPol = None # Política de memória, local ou global
@@ -26,8 +26,6 @@ vetprocessos = None
 totalCpuTimeLeft = 0
 vetpesos = [] # Só para o algoritmo de loteria
 algo = 1
-
-tempo = 0
 
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
