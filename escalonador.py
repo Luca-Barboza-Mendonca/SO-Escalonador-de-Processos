@@ -223,7 +223,9 @@ class Escalonador(QThread):
                     if sucesso:
                         vetprocessos.pop(j)
                     # Rever acima, quando o processo não consegue fazer es, ele continua na cpu
-                    print("test")
+                    print(vetprocessos)
+                    if vetprocessos == []:
+                        break
                     continue # rodar próximo processo
                     
                 
@@ -234,6 +236,7 @@ class Escalonador(QThread):
                     totalCpuTimeLeft -= self.cpufrac
                     
                     lock.acquire()
+                    writeLog("proc lock")
                     incrementarTempo(self.cpufrac)
                     lock.release()
                 elif (self.cpufrac >= vetprocessos[j].tempoRestante):
@@ -242,6 +245,7 @@ class Escalonador(QThread):
                     vetprocessos[j].tempoRestante = 0
 
                     lock.acquire()
+                    writeLog("fimproc lock")
                     incrementarTempo(self.cpufrac)
                     lock.release()
                     fout = open("output.txt", "a")
@@ -257,7 +261,9 @@ class Escalonador(QThread):
             lock.acquire()
             incrementarTempo(self.cpufrac)
             lock.release()
-
+        lock.acquire()
+        incrementarTempo(self.cpufrac)
+        lock.release()
         text = f"Todos os processos terminaram, tempo final de CPU {self.cpuTime}\nGerenciador de Memória: {self.gerente.outputMem()}"
         if (self.test):
             time.sleep(1)

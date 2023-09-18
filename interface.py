@@ -41,6 +41,9 @@ class Interface(QMainWindow):
         self.button.clicked.connect(self.on_click)
         layout.addWidget(self.button)
         layout.addWidget(self.listwidget)
+
+        for i in range(0, len(dispositivos)):
+            dispositivos[i].device_changed.connect(self.updateItem)
         
         self.threadEscalonador = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)

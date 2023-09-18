@@ -1,6 +1,26 @@
 alternanciaCircular 20 local 2048 512 75 2 1
  Processo processo1 entrou em ES no tempo 0
-Processo processo2 encerrou
+Processo processo2 entrou em ES no tempo 0
 Dispositivo 0 liberando processo processo1
 Processo processo1 terminou ES
-Processo processo1 entrou em ES no tempo 20
+Dispositivo 0 liberando processo processo2
+Processo processo2 terminou ES
+Processo processo1 entrou em ES no tempo 80
+Processo processo2 entrou em ES no tempo 80
+Dispositivo 0 liberando processo processo2
+Processo processo2 terminou ES
+Dispositivo 0 liberando processo processo1
+Processo processo1 terminou ES
+Processo processo2 entrou em ES no tempo 1840
+Processo processo1 entrou em ES no tempo 1840
+Dispositivo 0 liberando processo processo2
+Processo processo2 terminou ES
+Dispositivo 0 liberando processo processo1
+Processo processo1 terminou ES
+Processo processo2 entrou em ES no tempo 1980
+fimproc lock
+Processo processo1 encerrou
+Dispositivo 0 liberando processo processo2
+Processo processo2 terminou ES
+fimproc lock
+Processo processo2 encerrou

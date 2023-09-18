@@ -2,6 +2,7 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 from util import writeLog, lerTempo
 import threading
 import escalonador
+import interface
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
@@ -22,7 +23,7 @@ def initDispositivo(id, numSimultaneos, tempoOperacao):
 
 class Dispositivo(QThread):
 
-    text_device = pyqtSignal(str)
+    device_changed = pyqtSignal(str, int)
 
     def __init__(self, id, numSimultaneos, tempoOperacao):
         self.id = id - 1
@@ -49,19 +50,13 @@ class Dispositivo(QThread):
                 self.usoAtual += 1
 
                 return True
-            try:
-                if self.processosAtual[i].is_alive() == False:
-                    self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
-                    self.processosAtual[i].start()
-            except:
-                pass
         return False
     def liberarProcesso(self, index, processo):
         writeLog(f"Dispositivo {self.id} liberando processo {processo.nome}")
-        global vetprocessos
         escalonador.vetprocessos.append(processo)
         self.usoAtual -= 1
         self.processosAtual[index] = None
+        self.device_changed.emit(self.__str__(), self.id)
         
     
     def run(self):
@@ -70,7 +65,7 @@ class Dispositivo(QThread):
 
 
 def runIO(deviceID, ind, processo, tempoOperacao):
-    lock.acquire()
+    lock.acquire() #causando deadlock
     tempo = lerTempo()
     tempoFim = tempo + tempoOperacao
     lock.release()
@@ -81,6 +76,7 @@ def runIO(deviceID, ind, processo, tempoOperacao):
         if tempo >= tempoFim:
             dispositivos[deviceID].liberarProcesso(ind, processo)
             writeLog(f"Processo {processo.nome} terminou ES")
+            lock.release()
             break
         lock.release()
     return tempoFim
