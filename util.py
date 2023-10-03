@@ -42,3 +42,5 @@ def lerTempo():
     t = int(t)
     f.close()
     return t
+
+

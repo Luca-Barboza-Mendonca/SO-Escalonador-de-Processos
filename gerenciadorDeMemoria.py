@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 
+
 # Luca Barboza Mendonça, 149343
 # Obs: O gerenciador de memória roda uma vez por fração de CPU, assume-se que um processo precisa de toda a sua memória toda vez que entra na CPU, logo
 # se um processo necessita de 20 "segundos", e a fração de CPU é 10, ele fará todas as suas trocas 2 vezes
