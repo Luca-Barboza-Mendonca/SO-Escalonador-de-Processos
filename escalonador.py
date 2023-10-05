@@ -237,7 +237,6 @@ class Escalonador(QThread):
                     totalCpuTimeLeft -= self.cpufrac
                     
                     lock.acquire()
-                    writeLog("proc lock")
                     incrementarTempo(self.cpufrac)
                     lock.release()
                 elif (self.cpufrac >= vetprocessos[j].tempoRestante):
@@ -246,7 +245,6 @@ class Escalonador(QThread):
                     vetprocessos[j].tempoRestante = 0
 
                     lock.acquire()
-                    writeLog("fimproc lock")
                     incrementarTempo(self.cpufrac)
                     lock.release()
                     fout = open("output.txt", "a")

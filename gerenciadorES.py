@@ -3,6 +3,7 @@ from util import writeLog, lerTempo
 import threading
 import escalonador
 import interface
+from copy import deepcopy
 # numDispositivos = número de threads que devem ser incializadas
 
 dispositivos = []
@@ -31,6 +32,7 @@ class Dispositivo(QThread):
         self.tempoOperacao = tempoOperacao
         self.usoAtual = 0
         self.processosAtual = [None] * numSimultaneos
+        self.fila = []
 
         QThread.__init__(self)
 
@@ -41,7 +43,10 @@ class Dispositivo(QThread):
         tempo = lerTempo()
         writeLog(f"Processo {processo.nome} entrou em ES no tempo {tempo}")
         if self.usoAtual > self.numSimultaneos:
-            writeLog(f"Dispositivo {self.id} sobrecarregado, negando ES")
+            # Adicionar à fila
+            self.fila.append((processo, tempo))
+            self.fila = sorted(self.fila, key=lambda x: x[1])
+            writeLog(f"Dispositivo {self.id} sobrecarregado, adicionado à fila")
             return False
         for i in range(0, len(self.processosAtual)):
             if self.processosAtual[i] == None:
@@ -58,8 +63,13 @@ class Dispositivo(QThread):
         self.device_changed.emit(self.__str__(), self.id)
         escalonador.vetprocessos.append(processo)
         self.processosAtual[index] = None
+        self.moverFila()
         
-        
+    def moverFila(self):
+        escolha = deepcopy(self.fila[0][0])
+        self.fila.pop(0)
+        self.fila = sorted(self.fila, key=lambda x: x[1])
+        self.addProcesso(escolha)
     
     def run(self):
         # inicializa a thread dispositivo
