@@ -47,16 +47,18 @@ class Dispositivo(QThread):
             if self.processosAtual[i] == None:
                 self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
                 self.processosAtual[i].start()
-                self.usoAtual += 1
+                self.usoAtual = self.usoAtual + 1
 
                 return True
         return False
     def liberarProcesso(self, index, processo):
         writeLog(f"Dispositivo {self.id} liberando processo {processo.nome}")
-        escalonador.vetprocessos.append(processo)
-        self.usoAtual -= 1
-        self.processosAtual[index] = None
+        self.usoAtual = self.usoAtual - 1
+        writeLog(self.__str__())
         self.device_changed.emit(self.__str__(), self.id)
+        escalonador.vetprocessos.append(processo)
+        self.processosAtual[index] = None
+        
         
     
     def run(self):

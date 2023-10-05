@@ -5,6 +5,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QWidget, QListWidget
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget, QListWidgetItem
 from escalonador import *
+from util import writeLog
 
 class Interface(QMainWindow):
     '''Classe de Interface utilizando o Framework PyQt5 para criar uma interface de usuário simples, assim como implementar capacidades de paralelismo
@@ -41,16 +42,17 @@ class Interface(QMainWindow):
         self.button.clicked.connect(self.on_click)
         layout.addWidget(self.button)
         layout.addWidget(self.listwidget)
-
-        for i in range(0, len(dispositivos)):
-            dispositivos[i].device_changed.connect(self.updateItem)
-        
         self.threadEscalonador = Escalonador("input.txt", True) # mudar o segundo param. para desailitar sleep
         self.threadEscalonador.text_changed.connect(self.label.setText)
         self.threadEscalonador.device_added.connect(self.insertItem)
         self.threadEscalonador.device_changed.connect(self.updateItem)
+        self.threadEscalonador.device_connect.connect(self.connectDevices)
         self.threadEscalonador.start()
     
+    def connectDevices(self, r):
+        for i in range(0, len(dispositivos)):
+            dispositivos[i].device_changed.connect(self.updateItem)
+
     def on_click(self):
         textboxValue = self.textbox.text()
         addProcesso(textboxValue)

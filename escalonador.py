@@ -170,6 +170,7 @@ class Escalonador(QThread):
     text_changed = pyqtSignal(str)
     device_added = pyqtSignal(str)
     device_changed = pyqtSignal(str, int)
+    device_connect = pyqtSignal(int)
 
     def __init__(self, inp, test=False):
         self.input = inp
@@ -441,9 +442,10 @@ class Escalonador(QThread):
             id = int(line[0])
             numSimultaneos = int(line[1])
             tempoOp = int(line[2])
-
             device = initDispositivo(id, numSimultaneos, tempoOp)
             self.device_added.emit(device)
+        # Conectar dispostivivos
+        self.device_connect.emit(1)
 
         if (metodo == "alternanciaCircular"):
             while True:
