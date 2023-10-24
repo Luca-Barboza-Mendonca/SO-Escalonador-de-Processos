@@ -61,9 +61,11 @@ class Dispositivo(QThread):
         self.usoAtual = self.usoAtual - 1
         writeLog(self.__str__())
         self.device_changed.emit(self.__str__(), self.id)
+        # adquirir lock aqui
         escalonador.vetprocessos.append(processo)
         self.processosAtual[index] = None
-        self.moverFila()
+        if self.fila != []:
+            self.moverFila()
         
     def moverFila(self):
         escolha = deepcopy(self.fila[0][0])
@@ -84,7 +86,6 @@ def runIO(deviceID, ind, processo, tempoOperacao):
     while True:
         lock.acquire()
         tempo = lerTempo()
-        print(tempo)
         if tempo >= tempoFim:
             dispositivos[deviceID].liberarProcesso(ind, processo)
             writeLog(f"Processo {processo.nome} terminou ES")

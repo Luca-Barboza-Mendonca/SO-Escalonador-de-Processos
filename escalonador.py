@@ -207,8 +207,6 @@ class Escalonador(QThread):
                 # Emitindo os resultados para a interface
                 text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
                 self.text_changed.emit(text)
-                print(f"Processo {vetprocessos[j].PID} executando")
-                print(f"Tempo restante: {vetprocessos[j].tempoRestante}")
 
                 rand_numb = random.randint(1, 100)
 
@@ -221,10 +219,7 @@ class Escalonador(QThread):
                     proc = deepcopy(vetprocessos[j])
                     sucesso = dispositivos[dispositivo].addProcesso(proc)
                     self.device_changed.emit(dispositivos[dispositivo].__str__(), dispositivo)
-                    if sucesso:
-                        vetprocessos.pop(j)
-                    # Rever acima, quando o processo não consegue fazer es, ele continua na cpu
-                    print(vetprocessos)
+                    vetprocessos.pop(j)
                     if vetprocessos == []:
                         break
                     continue # rodar próximo processo
@@ -290,9 +285,6 @@ class Escalonador(QThread):
                 # Emitindo os resultados para a interface
                 text = f"Processo {prioridade.PID} executando\nTempo restante: {prioridade.tempoRestante}"
                 self.text_changed.emit(text)
-                print(f"Processo {prioridade.PID} executando")
-                print(f"Tempo restante: {prioridade.tempoRestante}")
-
                 self.gerente.requireMem(prioridade)
                 if (self.cpufrac < prioridade.tempoRestante):
                     prioridade.tempoRestante -= self.cpufrac

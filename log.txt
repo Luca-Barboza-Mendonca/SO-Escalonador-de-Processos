@@ -1,29 +1,53 @@
 alternanciaCircular 20 local 2048 512 75 2 1
  Processo processo1 entrou em ES no tempo 0
-fimproc lock
+Processo processo2 entrou em ES no tempo 0
+Processo processo3 entrou em ES no tempo 60
+Processo processo4 entrou em ES no tempo 80
 Dispositivo 0 liberando processo processo1
-Processo processo2 encerrou
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
-Processo processo1 terminou ES
-Processo processo1 entrou em ES no tempo 20
-Dispositivo 0 liberando processo processo1
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
-Processo processo1 terminou ES
-Processo processo1 entrou em ES no tempo 140
-Dispositivo 0 liberando processo processo1
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
-Processo processo1 terminou ES
-Processo processo1 entrou em ES no tempo 200
-Dispositivo 0 liberando processo processo1
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
-Processo processo1 terminou ES
-Processo processo1 entrou em ES no tempo 240
-Dispositivo 0 liberando processo processo1
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
 Processo processo1 terminou ES
 Processo processo1 entrou em ES no tempo 280
 Dispositivo 0 liberando processo processo1
-Dispositivo 0 Uso Máximo: 2 Uso Atual: 0
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
 Processo processo1 terminou ES
-fimproc lock
+Processo processo1 entrou em ES no tempo 480
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 600
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 800
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 980
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 1140
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 1580
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 1860
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 2860
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 3220
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
+Processo processo1 entrou em ES no tempo 4000
+Dispositivo 0 liberando processo processo1
+Dispositivo 0 Uso Máximo: 1 Uso Atual: 0
+Processo processo1 terminou ES
 Processo processo1 encerrou
