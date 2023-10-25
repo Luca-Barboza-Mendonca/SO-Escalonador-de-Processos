@@ -8,6 +8,7 @@ from sortedcontainers import SortedKeyList
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QPushButton, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QFont
+from threading import Lock
 
 from gerenciadorDeMemoria import *
 from gerenciadorES import Dispositivo, initDispositivo, lock, dispositivos
@@ -24,6 +25,8 @@ vetprocessos = None
 totalCpuTimeLeft = 0
 vetpesos = [] # Só para o algoritmo de loteria
 algo = 1
+
+vetprocessos_lock = Lock()
 
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
@@ -197,58 +200,62 @@ class Escalonador(QThread):
         global lock
 
         initProcessos(1) # inicializar o vetor global em modo alternância circular
-        j = 0
         while (totalCpuTimeLeft > 0):
             #executar escalonamento
-            j = 0
             while (len(vetprocessos) > 0): # revisar
-                if (vetprocessos[j].tempoRestante == 0):
-                    vetprocessos.pop(j)
+                if (vetprocessos[0].tempoRestante <= 0):
+                    vetprocessos.pop(0)
                 # Emitindo os resultados para a interface
-                text = f"Processo {vetprocessos[j].PID} executando\nTempo restante: {vetprocessos[j].tempoRestante}"
+                text = f"Processo {vetprocessos[0].PID} executando\nTempo restante: {vetprocessos[0].tempoRestante}"
                 self.text_changed.emit(text)
 
                 rand_numb = random.randint(1, 100)
 
                 # rand_numb = 1000 # DESATIVA ES
-                if (rand_numb <= vetprocessos[j].chanceBloquear):
+                if (rand_numb <= vetprocessos[0].chanceBloquear):
                     # Run I/O manager
                     global numDispositivos
                     global dispositivos
                     dispositivo = random.randint(0, numDispositivos-1) # Escolher qual dispositivo utilizar
-                    proc = deepcopy(vetprocessos[j])
+                    proc = deepcopy(vetprocessos[0])
                     sucesso = dispositivos[dispositivo].addProcesso(proc)
                     self.device_changed.emit(dispositivos[dispositivo].__str__(), dispositivo)
-                    vetprocessos.pop(j)
+                    vetprocessos_lock.acquire()
+                    if sucesso:
+                        vetprocessos.pop(0)
+                    else:
+                        writeLog("ERRO CRÍTICO")
+                    vetprocessos_lock.release()
                     if vetprocessos == []:
                         break
                     continue # rodar próximo processo
                     
                 
-                self.gerente.requireMem(vetprocessos[j])
-                if (self.cpufrac < vetprocessos[j].tempoRestante):
+                self.gerente.requireMem(vetprocessos[0])
+                if (self.cpufrac < vetprocessos[0].tempoRestante):
                     self.cpuTime += self.cpufrac
-                    vetprocessos[j].tempoRestante -= self.cpufrac
+                    vetprocessos[0].tempoRestante -= self.cpufrac
                     totalCpuTimeLeft -= self.cpufrac
                     
                     lock.acquire()
                     incrementarTempo(self.cpufrac)
                     lock.release()
-                elif (self.cpufrac >= vetprocessos[j].tempoRestante):
-                    self.cpuTime += vetprocessos[j].tempoRestante
-                    totalCpuTimeLeft -= vetprocessos[j].tempoRestante
-                    vetprocessos[j].tempoRestante = 0
+                elif (self.cpufrac >= vetprocessos[0].tempoRestante):
+                    self.cpuTime += vetprocessos[0].tempoRestante
+                    totalCpuTimeLeft -= vetprocessos[0].tempoRestante
+                    vetprocessos[0].tempoRestante = 0
 
                     lock.acquire()
                     incrementarTempo(self.cpufrac)
                     lock.release()
                     fout = open("output.txt", "a")
-                    fout.write(f"{vetprocessos[j].nome} encerrou em {self.cpuTime}\n")
+                    fout.write(f"{vetprocessos[0].nome} encerrou em {self.cpuTime}\n")
                     fout.close()
                     
-                    writeLog(f"Processo {vetprocessos[j].nome} encerrou")
-                    vetprocessos.pop(j)
-                
+                    writeLog(f"Processo {vetprocessos[0].nome} encerrou, tempo de cpu restante: {totalCpuTimeLeft}")
+                    vetprocessos_lock.acquire()
+                    vetprocessos.pop(0)
+                    vetprocessos_lock.release()
                 if (self.test):
                     time.sleep(1)
 

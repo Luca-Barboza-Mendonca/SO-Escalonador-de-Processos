@@ -2,7 +2,6 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal, Qt
 from util import writeLog, lerTempo
 import threading
 import escalonador
-import interface
 from copy import deepcopy
 # numDispositivos = número de threads que devem ser incializadas
 
@@ -37,17 +36,17 @@ class Dispositivo(QThread):
         QThread.__init__(self)
 
     def __str__(self):
-        return f"Dispositivo {self.id} Uso Máximo: {self.numSimultaneos} Uso Atual: {self.usoAtual}"
+        return f"Dispositivo {self.id} Uso Maximo: {self.numSimultaneos} Uso Atual: {self.usoAtual}"
     
     def addProcesso(self, processo):
         tempo = lerTempo()
         writeLog(f"Processo {processo.nome} entrou em ES no tempo {tempo}")
-        if self.usoAtual > self.numSimultaneos:
+        if self.usoAtual >= self.numSimultaneos:
             # Adicionar à fila
             self.fila.append((processo, tempo))
             self.fila = sorted(self.fila, key=lambda x: x[1])
-            writeLog(f"Dispositivo {self.id} sobrecarregado, adicionado à fila")
-            return False
+            writeLog(f"Dispositivo {self.id} sobrecarregado, adicionado a fila")
+            return True
         for i in range(0, len(self.processosAtual)):
             if self.processosAtual[i] == None:
                 self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
@@ -62,7 +61,9 @@ class Dispositivo(QThread):
         writeLog(self.__str__())
         self.device_changed.emit(self.__str__(), self.id)
         # adquirir lock aqui
+        escalonador.vetprocessos_lock.acquire()
         escalonador.vetprocessos.append(processo)
+        escalonador.vetprocessos_lock.release()
         self.processosAtual[index] = None
         if self.fila != []:
             self.moverFila()

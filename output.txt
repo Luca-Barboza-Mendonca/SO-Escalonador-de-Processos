@@ -1,1 +1,4 @@
-processo1 encerrou em 280
+processo3 encerrou em 60
+processo4 encerrou em 100
+processo1 encerrou em 140
+processo2 encerrou em 160
