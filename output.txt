@@ -1,4 +1,4 @@
-processo4 encerrou em 87
-processo1 encerrou em 109
-processo3 encerrou em 156
-processo2 encerrou em 160
+processo1 encerrou em 20, demorou 20 para executar, ficou pronto por 20 ficou bloqueado por 0
+processo2 encerrou em 580, demorou 580 para executar, ficou pronto por 100 ficou bloqueado por 480
+processo4 encerrou em 940, demorou 940 para executar, ficou pronto por 740 ficou bloqueado por 200
+processo3 encerrou em 1060, demorou 1060 para executar, ficou pronto por 780 ficou bloqueado por 280

@@ -49,18 +49,20 @@ class Dispositivo(QThread):
             return True
         for i in range(0, len(self.processosAtual)):
             if self.processosAtual[i] == None:
-                self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao))
+                self.processosAtual[i] = threading.Thread(target=runIO, args=(self.id, i, processo, self.tempoOperacao, tempo))
                 self.processosAtual[i].start()
                 self.usoAtual = self.usoAtual + 1
 
                 return True
         return False
-    def liberarProcesso(self, index, processo):
-        writeLog(f"Dispositivo {self.id} liberando processo {processo.nome}")
+    def liberarProcesso(self, index, processo, tempoInicio):
+        tempo = lerTempo()
+        writeLog(f"Dispositivo {self.id} liberando processo {processo.nome}, no tempo {tempo}")
         self.usoAtual = self.usoAtual - 1
         writeLog(self.__str__())
         self.device_changed.emit(self.__str__(), self.id)
         # adquirir lock aqui
+        processo.tempoBloqueado += tempo - tempoInicio
         escalonador.vetprocessos_lock.acquire()
         escalonador.vetprocessos.append(processo)
         escalonador.vetprocessos_lock.release()
@@ -79,7 +81,7 @@ class Dispositivo(QThread):
         return None
 
 
-def runIO(deviceID, ind, processo, tempoOperacao):
+def runIO(deviceID, ind, processo, tempoOperacao, tempoInicio):
     lock.acquire() #causando deadlock
     tempo = lerTempo()
     tempoFim = tempo + tempoOperacao
@@ -88,7 +90,7 @@ def runIO(deviceID, ind, processo, tempoOperacao):
         lock.acquire()
         tempo = lerTempo()
         if tempo >= tempoFim:
-            dispositivos[deviceID].liberarProcesso(ind, processo)
+            dispositivos[deviceID].liberarProcesso(ind, processo, tempoInicio)
             writeLog(f"Processo {processo.nome} terminou ES")
             lock.release()
             break

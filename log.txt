@@ -1,39 +1,27 @@
 alternanciaCircular 20 local 2048 512 75 2 1
- Processo processo1 entrou em ES no tempo 20
-Processo processo2 entrou em ES no tempo 40
+ Processo processo1 encerrou, tempo de cpu restante: 120
+Processo processo2 entrou em ES no tempo 80
+Processo processo3 entrou em ES no tempo 100
 Dispositivo 0 sobrecarregado, adicionado a fila
-Processo processo3 entrou em ES no tempo 60
+Processo processo4 entrou em ES no tempo 120
 Dispositivo 0 sobrecarregado, adicionado a fila
-Processo processo4 encerrou, tempo de cpu restante: 73
-Dispositivo 0 liberando processo processo1
+Dispositivo 0 liberando processo processo2, no tempo 560
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo2 entrou em ES no tempo 820
-Processo processo1 terminou ES
-Processo processo1 encerrou, tempo de cpu restante: 51
-Dispositivo 0 liberando processo processo2
-Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo3 entrou em ES no tempo 1080
+Processo processo3 entrou em ES no tempo 560
 Processo processo2 terminou ES
-Processo processo2 entrou em ES no tempo 1120
-Dispositivo 0 sobrecarregado, adicionado a fila
-Dispositivo 0 liberando processo processo3
+Processo processo2 encerrou, tempo de cpu restante: 54
+Dispositivo 0 liberando processo processo3, no tempo 700
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo2 entrou em ES no tempo 1280
+Processo processo4 entrou em ES no tempo 700
 Processo processo3 terminou ES
-Processo processo3 entrou em ES no tempo 1320
+Processo processo3 entrou em ES no tempo 760
 Dispositivo 0 sobrecarregado, adicionado a fila
-Dispositivo 0 liberando processo processo2
+Dispositivo 0 liberando processo processo4, no tempo 900
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo3 entrou em ES no tempo 1400
-Processo processo2 terminou ES
-Processo processo2 entrou em ES no tempo 1440
-Dispositivo 0 sobrecarregado, adicionado a fila
-Dispositivo 0 liberando processo processo3
+Processo processo3 entrou em ES no tempo 900
+Processo processo4 terminou ES
+Processo processo4 encerrou, tempo de cpu restante: 6
+Dispositivo 0 liberando processo processo3, no tempo 1040
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo2 entrou em ES no tempo 3280
 Processo processo3 terminou ES
-Processo processo3 encerrou, tempo de cpu restante: 4
-Dispositivo 0 liberando processo processo2
-Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo2 terminou ES
-Processo processo2 encerrou, tempo de cpu restante: 0
+Processo processo3 encerrou, tempo de cpu restante: 0

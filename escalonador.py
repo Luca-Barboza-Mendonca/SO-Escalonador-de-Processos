@@ -12,7 +12,7 @@ from threading import Lock
 
 from gerenciadorDeMemoria import *
 from gerenciadorES import Dispositivo, initDispositivo, lock, dispositivos
-from util import makeInput, incrementarTempo, writeLog
+from util import makeInput, incrementarTempo, writeLog, lerTempo
 
 memPol = None # Política de memória, local ou global
 tamMem = None # Tamanho da memória
@@ -30,7 +30,7 @@ vetprocessos_lock = Lock()
 
 class Processo:
     '''Registro que guarda todas as informações de um processo'''
-    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria, sequenciaMemoria, chance):
+    def __init__(self,nome, PID,tempoRestante, prioridade, UID, memoria, sequenciaMemoria, chance, nascimento):
         self.nome = nome
         self.PID = PID
         self.tempoRestante = tempoRestante
@@ -40,7 +40,8 @@ class Processo:
         self.sequenciaMemoria = sequenciaMemoria
         self.tempoRecebido = 0
         self.chanceBloquear = chance
-        self.pronto = True # True para pronto, False para bloqueado
+        self.tempoNascimento = nascimento
+        self.tempoBloqueado = 0
 
 def initProcessos(modo):
     '''criar um vetor global para guardar os processos, esse deve ser atualizado pelo input do usuário.
@@ -65,7 +66,8 @@ def initProcessos(modo):
             if (tmp == ""):
                 break
             x = tmp.split("|")
-            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]))
+            tempo = lerTempo()
+            processo = Processo(x[0], int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5]), list(map(int, x[6].split(" "))), int(x[7]), tempo)
             vetprocessos.append(processo)
             totalCpuTimeLeft += int(x[2])
             i += 1
@@ -227,6 +229,16 @@ class Escalonador(QThread):
                         totalCpuTimeLeft -= vetprocessos[0].tempoRestante
                         vetprocessos[0].tempoRestante = 0
 
+
+                        tempo = lerTempo()
+
+                        lock.acquire()
+                        incrementarTempo(self.cpufrac)
+                        lock.release()
+                        fout = open("output.txt", "a")
+                        fout.write(f"{vetprocessos[0].nome} encerrou em {tempo}, demorou {tempo - vetprocessos[0].tempoNascimento} para executar, ficou pronto por {tempo - vetprocessos[0].tempoNascimento - vetprocessos[0].tempoBloqueado} ficou bloqueado por {vetprocessos[0].tempoBloqueado}\n")
+                        fout.close()
+
                         writeLog(f"Processo {vetprocessos[0].nome} encerrou, tempo de cpu restante: {totalCpuTimeLeft}")
                         vetprocessos_lock.acquire()
                         vetprocessos.pop(0)
@@ -263,11 +275,13 @@ class Escalonador(QThread):
                     totalCpuTimeLeft -= vetprocessos[0].tempoRestante
                     vetprocessos[0].tempoRestante = 0
 
+                    tempo = lerTempo()
+
                     lock.acquire()
                     incrementarTempo(self.cpufrac)
                     lock.release()
                     fout = open("output.txt", "a")
-                    fout.write(f"{vetprocessos[0].nome} encerrou em {self.cpuTime}\n")
+                    fout.write(f"{vetprocessos[0].nome} encerrou em {tempo}, demorou {tempo - vetprocessos[0].tempoNascimento} para executar, ficou pronto por {tempo - vetprocessos[0].tempoNascimento - vetprocessos[0].tempoBloqueado} ficou bloqueado por {vetprocessos[0].tempoBloqueado}\n")
                     fout.close()
                     
                     writeLog(f"Processo {vetprocessos[0].nome} encerrou, tempo de cpu restante: {totalCpuTimeLeft}")
