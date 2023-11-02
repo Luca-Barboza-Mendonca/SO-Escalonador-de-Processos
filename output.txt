@@ -1,4 +1,4 @@
-processo3 encerrou em 60
-processo4 encerrou em 100
-processo1 encerrou em 140
+processo4 encerrou em 87
+processo1 encerrou em 109
+processo3 encerrou em 156
 processo2 encerrou em 160

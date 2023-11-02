@@ -202,26 +202,45 @@ class Escalonador(QThread):
         initProcessos(1) # inicializar o vetor global em modo alternância circular
         while (totalCpuTimeLeft > 0):
             #executar escalonamento
-            while (len(vetprocessos) > 0): # revisar
+            while (len(vetprocessos) > 0):
                 if (vetprocessos[0].tempoRestante <= 0):
                     vetprocessos.pop(0)
+                    break
                 # Emitindo os resultados para a interface
                 text = f"Processo {vetprocessos[0].PID} executando\nTempo restante: {vetprocessos[0].tempoRestante}"
                 self.text_changed.emit(text)
 
                 rand_numb = random.randint(1, 100)
-
-                # rand_numb = 1000 # DESATIVA ES
+                # rand_numb > 100 # DESATIVA ES
                 if (rand_numb <= vetprocessos[0].chanceBloquear):
                     # Run I/O manager
                     global numDispositivos
                     global dispositivos
                     dispositivo = random.randint(0, numDispositivos-1) # Escolher qual dispositivo utilizar
+                    fatia = random.randint(0, self.cpufrac) # Randomizar o ponto da fatia em que o processo foi bloqueado
+                    if vetprocessos[0].tempoRestante > fatia:
+                        vetprocessos[0].tempoRestante -= fatia
+                        self.cpuTime += fatia
+                        totalCpuTimeLeft -= fatia
+                    elif fatia >= vetprocessos[0].tempoRestante:
+                        self.cpuTime += vetprocessos[0].tempoRestante
+                        totalCpuTimeLeft -= vetprocessos[0].tempoRestante
+                        vetprocessos[0].tempoRestante = 0
+
+                        writeLog(f"Processo {vetprocessos[0].nome} encerrou, tempo de cpu restante: {totalCpuTimeLeft}")
+                        vetprocessos_lock.acquire()
+                        vetprocessos.pop(0)
+                        vetprocessos_lock.release()
+                        continue
+
+                    lock.acquire()
+                    incrementarTempo(self.cpufrac)
+                    lock.release() 
                     proc = deepcopy(vetprocessos[0])
                     sucesso = dispositivos[dispositivo].addProcesso(proc)
                     self.device_changed.emit(dispositivos[dispositivo].__str__(), dispositivo)
                     vetprocessos_lock.acquire()
-                    if sucesso:
+                    if sucesso: # processo está em E/S ou em fila para E/S
                         vetprocessos.pop(0)
                     else:
                         writeLog("ERRO CRÍTICO")
@@ -230,7 +249,6 @@ class Escalonador(QThread):
                         break
                     continue # rodar próximo processo
                     
-                
                 self.gerente.requireMem(vetprocessos[0])
                 if (self.cpufrac < vetprocessos[0].tempoRestante):
                     self.cpuTime += self.cpufrac

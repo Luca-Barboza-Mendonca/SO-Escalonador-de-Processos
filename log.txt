@@ -1,14 +1,38 @@
 alternanciaCircular 20 local 2048 512 75 2 1
- Processo processo1 entrou em ES no tempo 0
-Processo processo2 entrou em ES no tempo 20
+ Processo processo1 entrou em ES no tempo 20
+Processo processo2 entrou em ES no tempo 40
 Dispositivo 0 sobrecarregado, adicionado a fila
-Processo processo3 encerrou, tempo de cpu restante: 100
+Processo processo3 entrou em ES no tempo 60
+Dispositivo 0 sobrecarregado, adicionado a fila
+Processo processo4 encerrou, tempo de cpu restante: 73
 Dispositivo 0 liberando processo processo1
-Processo processo4 encerrou, tempo de cpu restante: 60
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
-Processo processo2 entrou em ES no tempo 100
+Processo processo2 entrou em ES no tempo 820
 Processo processo1 terminou ES
-Processo processo1 encerrou, tempo de cpu restante: 20
+Processo processo1 encerrou, tempo de cpu restante: 51
+Dispositivo 0 liberando processo processo2
+Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
+Processo processo3 entrou em ES no tempo 1080
+Processo processo2 terminou ES
+Processo processo2 entrou em ES no tempo 1120
+Dispositivo 0 sobrecarregado, adicionado a fila
+Dispositivo 0 liberando processo processo3
+Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
+Processo processo2 entrou em ES no tempo 1280
+Processo processo3 terminou ES
+Processo processo3 entrou em ES no tempo 1320
+Dispositivo 0 sobrecarregado, adicionado a fila
+Dispositivo 0 liberando processo processo2
+Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
+Processo processo3 entrou em ES no tempo 1400
+Processo processo2 terminou ES
+Processo processo2 entrou em ES no tempo 1440
+Dispositivo 0 sobrecarregado, adicionado a fila
+Dispositivo 0 liberando processo processo3
+Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
+Processo processo2 entrou em ES no tempo 3280
+Processo processo3 terminou ES
+Processo processo3 encerrou, tempo de cpu restante: 4
 Dispositivo 0 liberando processo processo2
 Dispositivo 0 Uso Maximo: 1 Uso Atual: 0
 Processo processo2 terminou ES
